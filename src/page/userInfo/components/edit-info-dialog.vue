@@ -47,6 +47,9 @@
 
 <script>
     import apiDataFilter from "../../../utils/apiDataFilter";
+    import {getLocalStore} from "../../../utils/webstore-utils";
+    import { USER } from '@/config/webstore'
+
 
     export default {
         name: "edit-info-dialog",
@@ -57,6 +60,7 @@
             return {
                 dialogEditInfo: false,
                 loading: false,
+                id: ''
             }
         },
         computed: {
@@ -109,6 +113,12 @@
                 }
             }
         },
+        mounted() {
+            let userObj = JSON.parse(getLocalStore(USER))
+            if (userObj) {
+                this.id = userObj.id
+            }
+        },
         created() {
 
         },
@@ -129,6 +139,7 @@
                             apiPath: 'user.updateUser',
                             method: 'post',
                             data: {
+                                id: this.id,
                                 name: this.userInfo.name,
                                 email: this.userInfo.email,
                                 phone: this.userInfo.phone,
@@ -142,6 +153,7 @@
                                     message: '编辑成功',
                                     type: "success"
                                 });
+                                this.dialogEditInfo = false
                             },
                             errorCallback: (err) => {
                                 this.loading = false

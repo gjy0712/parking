@@ -55,19 +55,19 @@
             </div>
             <div class="table-box">
                 <el-table :data="tableData" stripe style="width: 100%" class="el-table-reset-lite-style">
-                    <el-table-column prop="id" label="#" width="30"></el-table-column>
+                    <el-table-column type="index" label="#" width="30"></el-table-column>
                     <el-table-column prop="code" label="工号"></el-table-column>
                     <el-table-column prop="username" label="账号"></el-table-column>
                     <el-table-column prop="name" label="姓名"></el-table-column>
                     <el-table-column prop="sex" label="性别"></el-table-column>
                     <el-table-column prop="email" label="邮箱" width="180"></el-table-column>
                     <el-table-column prop="phone" label="电话" width="130"></el-table-column>
-                    <el-table-column prop="authority" label="权限">
+                    <el-table-column prop="type" label="权限">
                         <template slot-scope="props">
                             <el-tooltip class="item" effect="dark"
                                         :content="props.row.authority? '职员' : '管理员'" placement="top">
                                 <el-switch
-                                        v-model="props.row.authority"
+                                        v-model="props.row.type"
                                         :active-value='1'
                                         :inactive-value='0'
                                         active-color="#13ce66"
@@ -160,11 +160,10 @@
                     <el-form-item label="电话：" prop="phone">
                         <el-input v-model.trim="employeeData.phone" placeholder="请输入正确的手机号"></el-input>
                     </el-form-item>
-                    <el-form-item label="签名：" prop="signature">
+                    <el-form-item label="签名：" prop="description">
                         <el-input
                             type="textarea"
-                            v-model.trim="employeeData.signature"
-                            :disabled="isEdited"
+                            v-model.trim="employeeData.description"
                             placeholder="美好的一天!">
                         </el-input>
                     </el-form-item>
@@ -203,17 +202,7 @@
                     username: '',
                     name: ''
                 },
-                tableData: [
-                    {
-                        id: '1',
-                        code: '12345',
-                        username: '123456',
-                        name: '123456',
-                        sex: '男',
-                        email: 'qqq@c.com',
-                        phone: '15560156626'
-                    }
-                ],
+                tableData: [],
                 currentPage: 1,
                 pageSize: 100,
                 pageTotal: 0,
@@ -226,7 +215,7 @@
                     sex: '',
                     email: '',
                     phone: '',
-                    signature: ''
+                    description: ''
                 },
                 sexList: [
                     {
@@ -349,11 +338,11 @@
             },
             handleSizeChange(val) {
                 this.pageSize = val
-                // this.queryCpp()
+                this.getUserList()
             },
             handleCurrentChange(val) {
                 this.currentPage = val
-                // this.queryCpp()
+                this.getUserList()
             },
             // 关闭dialog
             handleCancel(formName) {
@@ -362,17 +351,58 @@
             },
             // 提交新员工信息
             handleSubmit() {
-
+                this.$refs['info'].validate(valid => {
+                    if (valid) {
+                        this.loading = true;
+                        apiDataFilter.request({
+                            apiPath: 'user.insertUser',
+                            method: 'post',
+                            data: {
+                                code: this.employeeData.code,
+                                username: this.employeeData.code,
+                                name: this.employeeData.name,
+                                sex: this.employeeData.sex,
+                                email: this.employeeData.email,
+                                phone: this.employeeData.phone,
+                                description: this.employeeData.description
+                            },
+                            successCallback: (res) => {
+                                this.loading = false;
+                                // 成功
+                                this.$notify({
+                                    title: '成功',
+                                    message: '添加成功',
+                                    type: "success"
+                                });
+                                this.dialogVisibleAddEmployee = false
+                                this.getUserList()
+                            },
+                            errorCallback: (err) => {
+                                this.loading = false
+                                // 失败
+                                this.$notify.error({
+                                    title: '失败',
+                                    message: '添加失败'
+                                });
+                                this.getUserList()
+                            },
+                        })
+                    }
+                })
             },
             getUserList() {
                 this.loading = true;
                 apiDataFilter.request({
                     apiPath: 'user.getUserList',
                     method: 'post',
-                    data: '',
+                    data: {
+                        pageNum: this.currentPage,
+                        pageSize: this.pageSize
+                    },
                     successCallback: (res) => {
                         this.loading = false;
-                        // this.tableData = res.data.garageInfoList;
+                        this.tableData = res.data.list;
+                        this.pageTotal = res.data.total;
                     },
                     errorCallback: (err) => {
                         // 失败

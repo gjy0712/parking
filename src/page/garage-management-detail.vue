@@ -32,13 +32,18 @@
                 <!--列表展示-->
                 <div class="table-box">
                     <el-table :data="tableData" stripe style="width: 100%" class="el-table-reset-lite-style">
-                        <el-table-column prop="id" label="#"></el-table-column>
-                        <el-table-column prop="name" label="名称"></el-table-column>
-                        <el-table-column prop="location" label="位置"></el-table-column>
-                        <el-table-column prop="price" label="价格" width="250"></el-table-column>
-                        <el-table-column prop="type" label="类型" width="180"></el-table-column>
+                        <el-table-column type="index" label="#" width="50"></el-table-column>
+                        <el-table-column prop="carName" label="名称"></el-table-column>
+                        <el-table-column prop="carLocation" label="位置"></el-table-column>
+                        <el-table-column prop="carPrice,carPriceTime" label="车位价格" width="200">
+                            <template slot-scope="scope">
+                                {{scope.row.carPrice}}元/{{scope.row.carPriceTime}}小时
+                            </template>
+                        </el-table-column>
+                        <el-table-column prop="carPrice" label="价格" width="250"></el-table-column>
+                        <el-table-column prop="carType" label="类型" width="180"></el-table-column>
                         <el-table-column prop="status" label="状态"></el-table-column>
-                        <el-table-column label="操作">
+                        <el-table-column label="操作" width="200">
                             <template slot-scope="scope">
                                 <el-button type="text" style="color: #61BD85;"
                                            @click="handleEdit(scope.row.id)">
@@ -86,20 +91,24 @@
                         :validate-on-rule-change="false"
                         class="demo-ruleForm">
                     <el-form-item label="名称：" prop="name">
-                        <el-input v-model.trim="infoData.name" placeholder="请输入车库的名称"></el-input>
+                        <el-input v-model.trim="infoData.carName" placeholder="请输入车库的名称"></el-input>
                     </el-form-item>
                     <el-form-item label="位置：" prop="location">
-                        <el-input v-model.trim="infoData.location" placeholder="请输入车位位置（可以不填）"></el-input>
+                        <el-input v-model.trim="infoData.carLocation" placeholder="请输入车位位置（可以不填）"></el-input>
                     </el-form-item>
-                    <el-form-item label="车位价格：" prop="price">
-                        <el-input class="car-price" v-model.trim="infoData.price" placeholder="价格"></el-input>
+                    <el-form-item label="车位价格：" prop="garagePrice">
+                        <el-input class="car-price" v-model.trim="infoData.carPrice" placeholder="价格"></el-input>
                         元/每
-                        <el-form-item prop="time" style="display: inline-block">
-                            <el-input class="car-price car-time" v-model.trim="infoData.time" placeholder="时间"></el-input>小时
-                        </el-form-item>
+                        <el-input class="car-price car-time"
+                                  style="width: 130px"
+                                  v-model.trim="infoData.carPriceTime"
+                                  ref="carPricetime"
+                                  placeholder="时间">
+                        </el-input>
+                        小时
                     </el-form-item>
-                    <el-form-item label="车位类型：" prop="type">
-                        <el-select v-model="infoData.type">
+                    <el-form-item label="车位类型：" prop="carType">
+                        <el-select v-model="infoData.carType">
                             <el-option
                                     v-for="item in typeList"
                                     :key="item.value"
@@ -132,14 +141,14 @@
                 class="el-dialog-style-reset"
                 :close-on-click-modal="false"
                 width="600px"
-                @click="handleCancel('info')">
+                @click="handleCancel('edit_info')">
             <div class="edit-box">
                 <div class="dialog-header">*注意：车位价格修改后，所有车位价格都将修改</div>
                 <el-form
                         :model="editCarData"
                         :rules="editCarRule"
                         size="small"
-                        ref="info"
+                        ref="edit_info"
                         label-width="100px"
                         :validate-on-rule-change="false"
                         class="demo-ruleForm">
@@ -167,7 +176,7 @@
             <span slot="footer" class="dialog-footer">
                 <el-button size="small"
                            class="custom-button_long"
-                           @click="handleCancelEdit('info')">关闭</el-button>
+                           @click="handleCancelEdit('edit_info')">关闭</el-button>
                 <el-button
                         size="small"
                         type="primary"
@@ -183,6 +192,8 @@
 
 <script>
     import { PageHeader } from "../components/public";
+    import apiDataFilter from "../utils/apiDataFilter";
+
 
     export default {
         name: "garage-management-detail",
@@ -211,17 +222,17 @@
                 dialogVisibleGarage: false,
                 loading :false,
                 infoData: {
-                    name: '',
-                    location: '',
-                    price: '',
-                    type: ''
+                    carName: '',
+                    carType: '',
+                    carPrice: '',
+                    carPriceTime: ''
                 },
                 typeList: [
                     {
-                        value: '1',
+                        value: '0',
                         label: '小车位'
                     }, {
-                        value: '2',
+                        value: '1',
                         label: '大车位'
                     }
                 ],
@@ -234,33 +245,39 @@
                     total: '',
                     price: '',
                     time: ''
-                }
-
+                },
+                garageId: '',
             }
+        },
+        created() {
+            this.garageId = this.$route.query.id || '';
+            this.getCarList()
         },
         computed: {
             infoRule() {
                 // 价格验证
                 const validatePrice = (rule, value, callback) => {
-                    const reg = /^[0-9]+([.]{1}[0-9]+){0,1}$/;
-                    if (!reg.test(value)) {
-                        callback(new Error('单位为整数或小数！'));
-                    } else {
-                        callback();
+                    let time = this.$refs.carPricetime.value;
+                    if( value === '') {
+                        callback(new Error('价格不能为空'));
+                    }else if( time === '') {
+                        callback(new Error('时间不能为空'));
+                    }else {
+                        const reg = /^[0-9]+([.]{1}[0-9]+){0,1}$/;
+                        if (!reg.test(value) || !reg.test(time)) {
+                            callback(new Error('单位为整数或小数！'));
+                        } else {
+                            callback();
+                        }
                     }
                 };
                 return {
-                    name: [
+                    carName: [
                         { required: true, message: "车库名称不能为空", trigger: 'blur' },
                         { min: 2, max: 12, message: "车库名称长度为2-12位", trigger: 'blur' }
                     ],
-                    price: [
+                    carPrice: [
                         { required: true, message: "价格不能为空", trigger: 'blur' },
-                        { min: 0.01, message: "最小价格为0.01", trigger: 'blur' },
-                        {validator: validatePrice, trigger: 'blur' }
-                    ],
-                    time: [
-                        { required: true, message: "时间不能为空", trigger: 'blur' },
                         { min: 0.01, message: "最小价格为0.01", trigger: 'blur' },
                         {validator: validatePrice, trigger: 'blur' }
                     ]
@@ -370,8 +387,45 @@
                 this.dialogVisibleGarage = false
                 // this.closeTooltip()
             },
+            // 新增/编辑确认按钮
             handleSubmit() {
-
+                this.$refs['info'].validate(valid => {
+                    if (valid) {
+                        this.loading = true;
+                        apiDataFilter.request({
+                            apiPath: 'car.insertCar',
+                            method:'post',
+                            data: {
+                                carName: this.infoData.carName,
+                                carType: parseInt(this.infoData.carType),
+                                carPrice: this.infoData.carPrice,
+                                carPriceTime: this.infoData.carPriceTime,
+                                garageId: parseInt(this.garageId)
+                            },
+                            successCallback: (res) => {
+                                this.loading = false;
+                                this.$notify({
+                                    title: '成功',
+                                    message: '添加车库车位成功',
+                                    type: "success"
+                                });
+                                this.dialogVisibleGarage = false;
+                                this.getCarList();
+                            },
+                            errorCallback: (err) => {
+                                this.$notify.error({
+                                    title: '失败',
+                                    message: '添加车库车位失败'
+                                });
+                                this.loading = false;
+                                this.dialogVisibleGarage = false;
+                            },
+                            completeCallback: () => {
+                                this.loading = false
+                            }
+                        })
+                    }
+                })
             },
             // 修改车库信息
             handleCancelEdit(formName) {
@@ -380,6 +434,25 @@
             },
             handleSubmitEdit() {
 
+            },
+            getCarList() {
+                this.loading = true;
+                apiDataFilter.request({
+                    apiPath: 'car.getCarList',
+                    method: 'post',
+                    data: {
+                        garageId: parseInt(this.garageId),
+                        pageNum: this.currentPage,
+                        pageSize: this.pageSize
+                    },
+                    successCallback: (res) => {
+                        this.loading = false;
+                        this.tableData = res.data;
+                    },
+                    errorCallback: (err) => {
+                        this.loading = false;
+                    },
+                })
             }
         }
     }

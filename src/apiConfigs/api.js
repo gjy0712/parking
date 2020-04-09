@@ -15,7 +15,7 @@ export default {
             updateType: '/user/updateType', // 更改用户权限类型
             updateStatus: '/user/updateStatus', // 更改用户状态
             deleteUser: '/user/deleteUser', // 删除用户
-            insertUser: '/user/insertUser', // 判断用户名是否存在
+            insertUser: '/user/insertUser', // 新增用户
             updateUser: '/user/updateUser', // // 编辑用户信息
             updatePassword: '/user/updatePassword', // 修改密码
             getUserList: '/user/getUserList', // // 获取用户列表

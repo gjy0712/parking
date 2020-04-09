@@ -226,11 +226,11 @@
             },
             handleSizeChange(val) {
                 this.pageSize = val
-                // this.queryCpp()
+                this.getGarageList()
             },
             handleCurrentChange(val) {
                 this.currentPage = val
-                // this.queryCpp()
+                this.getGarageList()
             },
             handleCancel(formName) {
                 this.$refs[formName].clearValidate()
