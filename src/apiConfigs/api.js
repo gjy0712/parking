@@ -43,6 +43,9 @@ export default {
         order: {
             // 今日车辆信息
             getTodayOrderList: '/order/getTodayOrderList', // 获取今日车辆信息
+            getCarOrder: '/order/getCarOrder', // 获取当前车位车辆信息
+            addCarOrder: '/order/addCarOrder', // 车辆入库新增订单
+            updateCarOrder: '/order/updateCarOrder', // 车辆车库修改订单
         }
     }
 }

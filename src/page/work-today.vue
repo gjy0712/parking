@@ -27,7 +27,7 @@
                         总数额：<span class="count-color">￥{{total}}元</span>
                     </div>
                 </div>
-                <div class="pagination-box">
+                <!--<div class="pagination-box">
                     <el-pagination
                             @size-change="handleSizeChange"
                             @current-change="handleCurrentChange"
@@ -38,7 +38,7 @@
                             :total="pageTotal"
                             class="custom-pagination">
                     </el-pagination>
-                </div>
+                </div>-->
             </div>
         </div>
     </div>
@@ -65,21 +65,21 @@
             this.getTodayOrderList()
         },
         methods: {
-            handleSizeChange(val) {
+            /*handleSizeChange(val) {
                 this.pageSize = val
-                // this.queryCpp()
+                this.getTodayOrderList()
             },
             handleCurrentChange(val) {
                 this.currentPage = val
-                // this.queryCpp()
-            },
+                this.getTodayOrderList()
+            },*/
             getTodayOrderList() {
                 apiDataFilter.request({
                     apiPath: 'order.getTodayOrderList',
                     method: 'post',
                     data: '',
                     successCallback: (res) => {
-                        // this.tableData = res.data.garageInfoList;
+                        // this.tableData = res.data;
                     },
                     errorCallback: (err) => {
                         // 失败

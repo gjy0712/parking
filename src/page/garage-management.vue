@@ -3,7 +3,7 @@
         <page-header :borderBottom="true">
             <el-breadcrumb separator-class="el-icon-arrow-right">
                 <el-breadcrumb-item>您当前所在的位置</el-breadcrumb-item>
-                <el-breadcrumb-item :to="{ path: '/carStationList' }">车库信息管理</el-breadcrumb-item>
+                <el-breadcrumb-item>车库信息管理</el-breadcrumb-item>
             </el-breadcrumb>
         </page-header>
 
@@ -30,11 +30,11 @@
                     <el-table-column label="操作" width="180">
                         <template slot-scope="scope">
                             <el-button size="mini"
-                                       @click="detail(scope.row.id)">
+                                       @click="detail(scope.row, scope.row.id)">
                                 详情
                             </el-button>
                             <el-button size="mini" type="danger"
-                                       @click="deleteData(scope.row.id, scope.$index)">
+                                       @click="deleteData(scope.row.id)">
                                 删除
                             </el-button>
                         </template>
@@ -130,7 +130,7 @@
                 tableData: [],
                 price: '',
                 currentPage: 1,
-                pageSize: 100,
+                pageSize: 10,
                 pageTotal: 0,
                 newCarData: {
                     garageName: '',
@@ -202,16 +202,23 @@
                 this.dialogVisibleAddGarage = true
 
             },
-            detail(id) {
+            // 跳转到详情页
+            detail(row,id) {
                 this.$router.push({
                     path: '/carStationDetail',
                     query: {
-                        id: id
+                        id: id,
+                        garageName: row.garageName,
+                        garageLocation: row.garageLocation,
+                        garageDescription: row.garageDescription,
+                        garageTotal: row.garageTotal,
+                        garagePrice: row.garagePrice,
+                        garagePricetime: row.garagePricetime
                     }
                 })
             },
-            // 删除数据
-            deleteData(scope, index) {
+            // 删除车库
+            deleteData(id) {
                 this.$confirm(
                     "您确认要删除此条数据吗？",
                     "提示",
@@ -221,7 +228,30 @@
                         type: 'warning'
                     }
                 ).then(() => {
-                    this.tableData.splice(index, 1)
+                    apiDataFilter.request({
+                        apiPath: 'garage.deleteGarage',
+                        method: 'post',
+                        data: {
+                            garageId: id
+                        },
+                        successCallback: (res) => {
+                            // 成功
+                            this.$notify({
+                                title: '成功',
+                                message: '删除车库成功',
+                                type: "success"
+                            });
+                            this.getGarageList()
+                        },
+                        errorCallback: (err) => {
+                            // 失败
+                            this.$notify.error({
+                                title: '失败',
+                                message: '删除车库失败'
+                            });
+                            this.getGarageList()
+                        },
+                    })
                 })
             },
             handleSizeChange(val) {
@@ -236,40 +266,69 @@
                 this.$refs[formName].clearValidate()
                 this.dialogVisibleAddGarage = false
                 this.loading = false
+                this.newCarData = {
+                    garageName: '',
+                    garageLocation: '',
+                    garageDescription: '',
+                    garageTotal: '',
+                    garagePrice: '',
+                    garagePricetime: ''
+                }
             },
-            // 提交车库
+            // 添加车库 提交
             handleSubmit() {
-                this.loading = true;
-                apiDataFilter.request({
-                        apiPath: 'garage.insertGarage',
-                        method: 'post',
-                        data: {
-                            garageName: this.newCarData.garageName,
-                            garageLocation: this.newCarData.garageLocation,
-                            garageDescription: this.newCarData.garageDescription,
-                            garageTotal: this.newCarData.garageTotal,
-                            garagePrice: this.newCarData.garagePrice,
-                            garagePricetime: this.newCarData.garagePricetime,
-                        },
-                        successCallback: (res) => {
-                            this.loading = false;
-                            this.$notify({
-                                title: '成功',
-                                message: '添加车库成功！',
-                                type: "success"
-                            });
-                            this.getGarageList()
-
-                        },
-                    errorCallback: (err) => {
-                        // 失败
-                        this.$notify.error({
-                            title: '失败',
-                            message: "添加车库失败"
-                        });
-                        this.loading = false;
-                        this.getGarageList()
-                    },
+                this.$refs['info'].validate(valid => {
+                    if (valid) {
+                        this.loading = true;
+                        apiDataFilter.request({
+                            apiPath: 'garage.insertGarage',
+                            method: 'post',
+                            data: {
+                                garageName: this.newCarData.garageName,
+                                garageLocation: this.newCarData.garageLocation,
+                                garageDescription: this.newCarData.garageDescription,
+                                garageTotal: this.newCarData.garageTotal,
+                                garagePrice: this.newCarData.garagePrice,
+                                garagePricetime: this.newCarData.garagePricetime,
+                            },
+                            successCallback: (res) => {
+                                this.loading = false;
+                                this.$notify({
+                                    title: '成功',
+                                    message: '添加车库成功！',
+                                    type: "success"
+                                });
+                                this.dialogVisibleAddGarage = false
+                                this.getGarageList()
+                                this.newCarData = {
+                                    garageName: '',
+                                    garageLocation: '',
+                                    garageDescription: '',
+                                    garageTotal: '',
+                                    garagePrice: '',
+                                    garagePricetime: ''
+                                }
+                            },
+                            errorCallback: (err) => {
+                                // 失败
+                                this.$notify.error({
+                                    title: '失败',
+                                    message: err.data.msg
+                                });
+                                this.loading = false;
+                                this.dialogVisibleAddGarage = false
+                                this.getGarageList()
+                                this.newCarData = {
+                                    garageName: '',
+                                    garageLocation: '',
+                                    garageDescription: '',
+                                    garageTotal: '',
+                                    garagePrice: '',
+                                    garagePricetime: ''
+                                }
+                            },
+                        })
+                    }
                 })
             },
             getGarageList() {
@@ -277,10 +336,14 @@
                 apiDataFilter.request({
                     apiPath: 'garage.getGarageList',
                     method: 'post',
-                    data: '',
+                    data: {
+                        pageNum: this.currentPage,
+                        pageSize: this.pageSize
+                    },
                     successCallback: (res) => {
                         this.loading = false;
-                        this.tableData = res.data.garageInfoList;
+                        this.tableData = res.data.list;
+                        this.pageTotal = res.data.total
                     },
                     errorCallback: (err) => {
                         // 失败

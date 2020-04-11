@@ -45,14 +45,10 @@
 </template>
 
 <script>
-   /* import apiDataFilter from "../../../utils/apiDataFilter";
-    import {getLocalStore} from "../../../utils/webstore-utils";
-    import {USER} from "../../../config/webstore";
-    import store from '@/vuex/store'*/
-
     import apiDataFilter from "../../../utils/apiDataFilter";
-   import {getLocalStore} from "../../../utils/webstore-utils";
-   import { USER } from '@/config/webstore'
+    import {getLocalStore} from "../../../utils/webstore-utils";
+    import { USER } from '@/config/webstore'
+    import store from '@/vuex/store'
 
    export default {
         name: 'UpdatePasswordDialog',
@@ -105,9 +101,9 @@
                     checkPassword:''
                 }
                 this.dialogUpdatePassword = false
-                if (this.isLogin){
+                /*if (this.isLogin){
                     this.$emit('showLogin')
-                }
+                }*/
             },
             /*确定新增或修改字段信息*/
             handleSubmit() {
@@ -125,9 +121,9 @@
                             },
                             successCallback: (res) => {
                                 this.$message.success('密码修改成功，请重新登录！')
-                                /*store.dispatch('LogOut').then(() => {
+                                store.dispatch('LogOut').then(() => {
                                     location.reload() // 为了重新实例化vue-router对象 避免bug
-                                })*/
+                                })
                                 /*if (this.isLogin){
                                     this.$message.success('密码修改成功，请重新登录！')
                                     store.dispatch('LogOut').then(() => {
@@ -138,7 +134,7 @@
                                 }*/
                             },
                             errorCallback: (err) => {
-                                this.$message.error(err.data.error)
+                                this.$message.error(err.msg)
                             },
                             completeCallback: () => {
                                 this.optionsLoading = false

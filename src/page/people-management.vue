@@ -65,7 +65,7 @@
                     <el-table-column prop="type" label="权限">
                         <template slot-scope="props">
                             <el-tooltip class="item" effect="dark"
-                                        :content="props.row.authority? '职员' : '管理员'" placement="top">
+                                        :content="props.row.type==='ADMIN'? '管理员' : '职员'" placement="top">
                                 <el-switch
                                         v-model="props.row.type"
                                         :active-value='1'
@@ -94,7 +94,7 @@
                     </el-table-column>
                     <el-table-column prop="account_cloud_id" label="操作">
                         <template slot-scope="scope">
-                            <el-button @click="handleDelete(scope.row, scope.$index)" type="text">
+                            <el-button @click="handleDelete(scope.row.id)" type="text">
                                 删除
                             </el-button>
                         </template>
@@ -219,10 +219,10 @@
                 },
                 sexList: [
                     {
-                        value: '1',
+                        value: '男',
                         label: '男'
                     }, {
-                        value: '0',
+                        value: '女',
                         label: '女'
                     }
                 ],
@@ -315,7 +315,7 @@
                 this.dialogVisibleAddEmployee = true
             },
             // 管理员与职员修改
-            changeAuthority(){
+            changeAuthority(val, id){
 
             },
             // 状态开关 可用禁用
@@ -323,7 +323,7 @@
                 // console.log(id);
             },
             // 删除
-            handleDelete(scope, index) {
+            handleDelete(id) {
                 this.$confirm(
                     "您确认要删除此条数据吗？",
                     "提示",
@@ -333,7 +333,30 @@
                         type: 'warning'
                     }
                 ).then(() => {
-                    this.tableData.splice(index, 1)
+                    apiDataFilter.request({
+                        apiPath: 'user.deleteUser',
+                        method: 'post',
+                        data: {
+                            userID: id
+                        },
+                        successCallback: (res) => {
+                            // 成功
+                            this.$notify({
+                                title: '成功',
+                                message: '删除成功',
+                                type: "success"
+                            });
+                            this.getUserList()
+                        },
+                        errorCallback: (err) => {
+                            // 失败
+                            this.$notify.error({
+                                title: '失败',
+                                message: '删除失败'
+                            });
+                            this.getUserList()
+                        },
+                    })
                 })
             },
             handleSizeChange(val) {
@@ -359,7 +382,7 @@
                             method: 'post',
                             data: {
                                 code: this.employeeData.code,
-                                username: this.employeeData.code,
+                                username: this.employeeData.username,
                                 name: this.employeeData.name,
                                 sex: this.employeeData.sex,
                                 email: this.employeeData.email,
@@ -375,6 +398,16 @@
                                     type: "success"
                                 });
                                 this.dialogVisibleAddEmployee = false
+                                this.employeeData = {
+                                    username: '',
+                                    password: '',
+                                    code: '',
+                                    name: '',
+                                    sex: '',
+                                    email: '',
+                                    phone: '',
+                                    description: ''
+                                }
                                 this.getUserList()
                             },
                             errorCallback: (err) => {
@@ -443,12 +476,12 @@
                 }
             }
         }
-
         .content-box {
             padding: 20px;
 
             .button-box {
             }
         }
+
     }
 </style>

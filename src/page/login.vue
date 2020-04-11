@@ -82,10 +82,6 @@
                                 let token = res.data.token
                                 setLocalStore(TOKEN, token)
                                 setLocalStore(USER, userInfo)
-                                // this.userToken = res.data.token;
-                                // 将用户token保存到vuex中
-                                // this.changeLogin({ Authorization:this.userToken });
-                                // 成功
                                 this.$notify({
                                     title: '成功',
                                     message: '登录成功！',
