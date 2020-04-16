@@ -3,7 +3,7 @@
         <page-header :borderBottom="true">
             <el-breadcrumb separator-class="el-icon-arrow-right">
                 <el-breadcrumb-item>您当前所在的位置</el-breadcrumb-item>
-                <el-breadcrumb-item :to="{ path: '/employee' }">人员管理</el-breadcrumb-item>
+                <el-breadcrumb-item>人员管理</el-breadcrumb-item>
             </el-breadcrumb>
         </page-header>
         <!--条件搜索-->

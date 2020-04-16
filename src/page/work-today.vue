@@ -12,11 +12,11 @@
 
             <div class="table-box">
                 <el-table :data="tableData" stripe style="width: 100%" class="el-table-reset-lite-style">
-                    <el-table-column prop="id" label="#"></el-table-column>
+                    <el-table-column type="index" prop="id" label="#"></el-table-column>
                     <el-table-column prop="numberPlate" label="车牌号"></el-table-column>
                     <el-table-column prop="startTime" label="开始时间"></el-table-column>
                     <el-table-column prop="endTime" label="结束时间"></el-table-column>
-                    <el-table-column prop="total" label="停车时长"></el-table-column>
+                    <el-table-column prop="stopTime" label="停车时长"></el-table-column>
                     <el-table-column prop="total" label="总价"></el-table-column>
                 </el-table>
 
@@ -53,16 +53,24 @@
         components: { PageHeader },
         data() {
             return {
-                tableData: [],
+                tableData: [
+                    {
+                        numberPlate:'赣K 87234',
+                        startTime: '2020-04-14 13-00',
+                        endTime: '2020-04-14 16-00',
+                        total: '9元',
+                        stopTime: '3小时',
+                    }
+                ],
                 currentPage: 1,
                 pageSize: 100,
                 pageTotal: 0,
-                number: '0',
-                total: '0.0'
+                number: '1',
+                total: '9.0'
             }
         },
         created() {
-            this.getTodayOrderList()
+            // this.getTodayOrderList()
         },
         methods: {
             /*handleSizeChange(val) {

@@ -35,33 +35,33 @@
 
             <div class="count-box">
                 <div class="count-content">
-                    车牌号：<span class="count-color">{{}}</span>
+                    车牌号：<span class="count-color"></span>
                 </div>
                 <div class="count-content">
-                    车库：<span class="count-color">{{}}</span>
+                    车库：<span class="count-color"></span>
                     <div class="count-space"></div>
-                    车位：<span class="count-green-color">{{}}</span>
+                    车位：<span class="count-green-color"></span>
                 </div>
                 <div class="count-content">
-                    车位类型：<span class="count-color">{{}}</span>
+                    车位类型：<span class="count-color"></span>
                 </div>
                 <div class="count-content">
-                    入库时间：<span>{{}}</span>
+                    入库时间：<span></span>
                     <div class="count-space"></div>
-                    出库时间：<span>{{}}</span>
+                    出库时间：<span></span>
                 </div>
                 <div class="count-content">
-                    价格：<span>{{}}</span>
+                    价格：<span></span>
                     <div class="count-space"></div>
-                    停车时间：<span>{{}}</span>
+                    停车时间：<span></span>
                 </div>
                 <div class="count-content">
-                    操作人：<span>{{}}</span>
+                    操作人：<span></span>
                     <div class="count-space"></div>
-                    工号：<span>{{code}}</span>
+                    工号：<span></span>
                 </div>
                 <div class="count-content count-total">
-                    总计：<span class="count-color">{{}}</span>
+                    总计：<span class="count-color"></span>
                 </div>
             </div>
         </div>

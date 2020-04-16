@@ -152,13 +152,13 @@
                 margin: 0 43px;
             }
             .bg-red {
-                background: #f40;
+                background: #ffcec6;
             }
             .bg-green {
-                background: #00B51D;
+                background: #8cb5a9;
             }
             .bg-green-dark {
-                background: #30A080;
+                background: #7d9da0;
             }
             .grid-content {
                 border-radius: 10px;

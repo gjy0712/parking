@@ -31,23 +31,23 @@
                               placeholder="请输入车牌号码">
                     </el-input>
                 </el-form-item>
-                <el-form-item label="车位名：" prop="carName">
+                <!--<el-form-item label="车位名：" prop="carName">
                     <el-input v-model.trim="searchData.carName" placeholder="请输入车位名" style="width: 315px"></el-input>
-                </el-form-item>
+                </el-form-item>-->
             </el-form>
         </div>
         <span slot="footer" class="dialog-footer">
             <el-button size="small"
                        class="custom-button_long"
                        @click="handleCancel('info')">关闭</el-button>
-            <!--<el-button
+            <el-button
                     size="small"
                     type="primary"
                     :loading="loading"
                     class="custom-button_long"
                     @click="handleSubmit()">
-                确定
-            </el-button>-->
+                搜索
+            </el-button>
         </span>
     </el-dialog>
 </template>
@@ -227,6 +227,9 @@
             handleCancel(formName) {
                 this.$refs[formName].clearValidate()
                 this.dialogSearch = false
+            },
+            handleSubmit() {
+
             }
         }
     }
