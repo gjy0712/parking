@@ -25,7 +25,8 @@ export default {
             getGarageList: '/garage/getGarageList', // 获取车库列表
             insertGarage: '/garage/insertGarage', // 新增车库信息
             deleteGarage: '/garage/deleteGarage', // 删除车库
-            updateGarage: '/garage/updateGarage', // 更新车库信息
+            updateGarage: '/garage/updateGarage', // 更新车库信息,
+            getGarage: '/garage/getGarage', //修改车库信息
         },
         car: {
             // 车位信息

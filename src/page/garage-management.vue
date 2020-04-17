@@ -16,7 +16,7 @@
                 </el-button>
             </div>
             <div class="table-box">
-                <el-table :data="tableData" stripe style="width: 100%" class="el-table-reset-lite-style">
+                <el-table :data="tableData" v-loading="loading" stripe style="width: 100%" class="el-table-reset-lite-style">
                     <el-table-column type="index" width="50" label="#"></el-table-column>
                     <el-table-column prop="garageName" label="名称"></el-table-column>
                     <el-table-column prop="garageLocation" label="位置"></el-table-column>
@@ -208,12 +208,12 @@
                     path: '/carStationDetail',
                     query: {
                         id: id,
-                        garageName: row.garageName,
+                        /*garageName: row.garageName,
                         garageLocation: row.garageLocation,
                         garageDescription: row.garageDescription,
                         garageTotal: row.garageTotal,
                         garagePrice: row.garagePrice,
-                        garagePricetime: row.garagePricetime
+                        garagePricetime: row.garagePricetime*/
                     }
                 })
             },

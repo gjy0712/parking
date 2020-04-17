@@ -54,7 +54,7 @@
                 </el-button>
             </div>
             <div class="table-box">
-                <el-table :data="tableData" stripe style="width: 100%" class="el-table-reset-lite-style">
+                <el-table :data="tableData" v-loading="loading" stripe style="width: 100%" class="el-table-reset-lite-style">
                     <el-table-column type="index" label="#" width="30"></el-table-column>
                     <el-table-column prop="code" label="工号"></el-table-column>
                     <el-table-column prop="username" label="账号"></el-table-column>
@@ -63,33 +63,15 @@
                     <el-table-column prop="email" label="邮箱" width="180"></el-table-column>
                     <el-table-column prop="phone" label="电话" width="130"></el-table-column>
                     <el-table-column prop="type" label="权限">
-                        <template slot-scope="props">
-                            <el-tooltip class="item" effect="dark"
-                                        :content="props.row.type==='ADMIN'? '管理员' : '职员'" placement="top">
-                                <el-switch
-                                        v-model="props.row.type"
-                                        :active-value='1'
-                                        :inactive-value='0'
-                                        active-color="#13ce66"
-                                        inactive-color="#ff4949"
-                                        @change="(val)=>changeAuthority(val,props.row.id)">
-                                </el-switch>
-                            </el-tooltip>
+                        <template slot-scope="scope">
+                            <el-button v-if="scope.row.type==='ADMIN' " type="success" size="mini" @click="changeAuthority(scope.row, scope.row.id)">管理员</el-button>
+                            <el-button v-else type="danger" size="mini" @click="changeAuthority(scope.row, scope.row.id)">禁用</el-button>
                         </template>
                     </el-table-column>
                     <el-table-column prop="status" label="状态">
-                        <template slot-scope="props">
-                            <el-tooltip class="item" effect="dark"
-                                        :content="props.row.status? '禁用' : '可用'" placement="top">
-                                <el-switch
-                                        v-model="props.row.status"
-                                        :active-value='1'
-                                        :inactive-value='0'
-                                        active-color="#13ce66"
-                                        inactive-color="#ff4949"
-                                        @change="(val)=>changeStatus(val,props.row.id)">
-                                </el-switch>
-                            </el-tooltip>
+                        <template slot-scope="scope">
+                            <el-button v-if="scope.row.status===1" type="success" size="mini" @click="changeStatus(scope.row, scope.row.id)">可用</el-button>
+                            <el-button v-else type="danger" size="mini" @click="changeStatus(scope.row, scope.row.id)">禁用</el-button>
                         </template>
                     </el-table-column>
                     <el-table-column prop="account_cloud_id" label="操作">
@@ -302,25 +284,85 @@
             this.getUserList()
         },
         methods: {
+            handleSizeChange(val) {
+                this.pageSize = val
+                this.getUserList()
+            },
+            handleCurrentChange(val) {
+                this.currentPage = val
+                this.getUserList()
+            },
             // 搜索查询
             handleSearch() {
-
+                this.getUserList()
             },
             // 重置按钮
             handleReset() {
-
+                this.searchObj = {
+                    code: '',
+                    username: '',
+                    name: ''
+                }
             },
             // 添加员工按钮
             handleClickAddUser() {
                 this.dialogVisibleAddEmployee = true
             },
             // 管理员与职员修改
-            changeAuthority(val, id){
-
+            changeAuthority(row, id){
+                apiDataFilter.request({
+                    apiPath: 'user.updateType',
+                    method: 'post',
+                    data: {
+                        userID: parseInt(id),
+                        type: row.type
+                    },
+                    successCallback: (res) => {
+                        // 成功
+                        this.$notify({
+                            title: '成功',
+                            message: '更改用户权限类型成功',
+                            type: "success"
+                        });
+                        this.getUserList()
+                    },
+                    errorCallback: (err) => {
+                        // 失败
+                        this.$notify.error({
+                            title: '失败',
+                            message: '更改用户权限类型失败'
+                        });
+                        this.getUserList()
+                    },
+                })
             },
             // 状态开关 可用禁用
-            changeStatus(value, id) {
-                // console.log(id);
+            changeStatus(row, id) {
+                apiDataFilter.request({
+                    apiPath: 'user.updateStatus',
+                    method: 'post',
+                    data: {
+                        userID: parseInt(id),
+                        status: parseInt(row.status)
+                    },
+                    successCallback: (res) => {
+                        // 成功
+                        this.$notify({
+                            title: '成功',
+                            message: '更改用户状态成功',
+                            type: "success"
+                        });
+                        this.getUserList()
+                    },
+                    errorCallback: (err) => {
+                        // 失败
+                        this.$notify.error({
+                            title: '失败',
+                            message: '更改用户状态失败'
+                        });
+                        this.getUserList()
+                    },
+                })
             },
             // 删除
             handleDelete(id) {
@@ -359,14 +401,7 @@
                     })
                 })
             },
-            handleSizeChange(val) {
-                this.pageSize = val
-                this.getUserList()
-            },
-            handleCurrentChange(val) {
-                this.currentPage = val
-                this.getUserList()
-            },
+
             // 关闭dialog
             handleCancel(formName) {
                 this.$refs[formName].clearValidate()

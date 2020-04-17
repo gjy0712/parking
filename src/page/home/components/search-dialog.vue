@@ -57,6 +57,7 @@
         name: "search-dialog",
         data() {
             return {
+                loading: false,
                 dialogSearch: false,
                 searchData: {
                     carNumber: '',

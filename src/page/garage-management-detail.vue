@@ -32,7 +32,7 @@
                 </div>
                 <!--列表展示-->
                 <div class="table-box">
-                    <el-table :data="tableData" stripe style="width: 100%" class="el-table-reset-lite-style">
+                    <el-table :data="tableData" v-loading="loading" stripe style="width: 100%" class="el-table-reset-lite-style">
                         <el-table-column type="index" label="#" width="50"></el-table-column>
                         <el-table-column prop="carName" label="名称"></el-table-column>
                         <el-table-column prop="carLocation" label="位置"></el-table-column>
@@ -41,13 +41,22 @@
                                 {{scope.row.carPrice}}元/{{scope.row.carPriceTime}}小时
                             </template>
                         </el-table-column>
-                        <el-table-column prop="carPrice" label="价格" width="250"></el-table-column>
-                        <el-table-column prop="carType" label="类型" width="180"></el-table-column>
-                        <el-table-column prop="status" label="状态"></el-table-column>
+                        <el-table-column prop="carType" label="类型" width="180">
+                            <!--<template  slot-scope="scope">
+                                    {{carType(scope.row.carType)}}
+                            </template>-->
+                        </el-table-column>
+                        <el-table-column prop="carStatus" label="状态">
+                            <template  slot-scope="scope">
+                                <span v-if="scope.row.carStatus=== 0" style="color: green;font-size: 10px">空闲</span>
+                                <span v-else-if="scope.row.carStatus=== 1" style="color: red;font-size: 10px">有车</span>
+<!--                                {{carStatus(scope.row.carStatus)}}-->
+                            </template>
+                        </el-table-column>
                         <el-table-column label="操作" width="200">
                             <template slot-scope="scope">
                                 <el-button type="text" style="color: #61BD85;"
-                                           @click="handleEdit(scope.row.id)">
+                                           @click="handleEdit(scope.$index)">
                                     修改
                                 </el-button>
                                 <el-button type="text" style="color: #F14A56;"
@@ -135,7 +144,7 @@
             </span>
         </el-dialog>
 
-        <!--    修改车库信息    -->
+        <!--    修改车库    -->
         <el-dialog
                 title="修改车库信息"
                 :visible.sync="dialogVisibleEdit"
@@ -188,7 +197,7 @@
                         :loading="loading"
                         class="custom-button_long"
                         @click="handleSubmitEdit()">
-                    添加
+                    确定
                 </el-button>
             </span>
         </el-dialog>
@@ -205,6 +214,9 @@
         components: { PageHeader },
         data() {
             return {
+                loading :false,
+                isEdited: false,
+
                 garageObj: {
                     garageName: '',
                     garageLocation: '',
@@ -217,26 +229,9 @@
                 currentPage: 1,
                 pageSize: 10,
                 pageTotal: 0,
-                isEdited: false,
-                dialogVisibleGarage: false,
-                loading :false,
-                infoData: {
-                    carName: '',
-                    carType: '',
-                    carPrice: '',
-                    carPriceTime: ''
-                },
-                typeList: [
-                    {
-                        value: 'SMALL_CAR',
-                        label: '小车位'
-                    }, {
-                        value: 'LARGER_CAR',
-                        label: '大车位'
-                    }
-                ],
                 // 修改车库信息的dialog
                 dialogVisibleEdit: false,
+                // 车库的
                 editCarData: {
                     name: '',
                     location: '',
@@ -245,27 +240,38 @@
                     price: '',
                     priceTime: ''
                 },
+                dialogVisibleGarage: false, // 修改/添加车位
+                // 车位
+                infoData: {
+                    carName: '',
+                    carType: '',
+                    carPrice: '',
+                    carPriceTime: '',
+                    carLocation: ''
+                },
+                typeList: [
+                    {
+                        value: '小车位',
+                        label: '小车位'
+                    }, {
+                        value: '大车位',
+                        label: '大车位'
+                    }
+                ],
                 garageId: '',
             }
         },
         created() {
             this.garageId = this.$route.query.id || '';
-            this.garageObj.garageName = this.$route.query.garageName || '';
+            /*this.garageObj.garageName = this.$route.query.garageName || '';
             this.garageObj.garageLocation = this.$route.query.garageLocation || '';
             this.garageObj.garageDescription = this.$route.query.garageDescription || '';
             this.garageObj.garageTotal = this.$route.query.garageTotal || '';
             this.garageObj.garagePrice = this.$route.query.garagePrice || '';
-            this.garageObj.garagePricetime = this.$route.query.garagePricetime || '';
-
-            this.editCarData.name = this.$route.query.garageName || '';
-            this.editCarData.location = this.$route.query.garageLocation || '';
-            this.editCarData.description = this.$route.query.garageDescription || '';
-            this.editCarData.total = this.$route.query.garageTotal || '';
-            this.editCarData.price = this.$route.query.garagePrice || '';
-            this.editCarData.priceTime = this.$route.query.garagePricetime || '';
+            this.garageObj.garagePricetime = this.$route.query.garagePricetime || '';*/
 
             this.getCarList()
-            // this.getGarageList()
+            this.getGarageList()
         },
         computed: {
             infoRule() {
@@ -292,7 +298,6 @@
                     ],
                     carPrice: [
                         { required: true, message: "价格不能为空", trigger: 'blur' },
-                        { min: 0.01, message: "最小价格为0.01", trigger: 'blur' },
                         {validator: validatePrice, trigger: 'blur' }
                     ],
                     carType: [
@@ -351,6 +356,18 @@
             }
         },
         methods: {
+            carStatus(type){
+                let text = "";
+                switch(type){
+                    case 0:
+                        text = '空闲';
+                        break;
+                    case 1:
+                        text = '有车';
+                        break;
+                }
+                return text;
+            },
             handleSizeChange(val) {
                 this.pageSize = val
                 this.getCarList()
@@ -359,126 +376,13 @@
                 this.currentPage = val
                 this.getCarList()
             },
-            // 修改车库车位
-            handleEdit() {
-                this.isEdited = true
-                this.dialogVisibleGarage = true
-            },
-            // 删除数据
-            deleteData(id) {
-                this.$confirm(
-                    "您确认要删除此条数据吗？",
-                    "提示",
-                    {
-                        confirmButtonText: "确认",
-                        cancelButtonText: "取消",
-                        type: 'warning'
-                    }
-                ).then(() => {
-                    apiDataFilter.request({
-                        apiPath: 'car.deleteCar',
-                        method: 'post',
-                        data: {
-                            carId: id
-                        },
-                        successCallback: (res) => {
-                            // 成功
-                            this.$notify({
-                                title: '成功',
-                                message: '删除车位成功',
-                                type: "success"
-                            });
-                            this.getCarList()
-                        },
-                        errorCallback: (err) => {
-                            // 失败
-                            this.$notify.error({
-                                title: '失败',
-                                message: '删除车位失败'
-                            });
-                            this.getCarList()
-                        },
-                    })
-                })
-            },
-            // 修改车库信息
+            // 修改车库
             handleClickEditInfo() {
-                this.dialogVisibleEdit = true
-            },
-            // 添加车库车位
-            handleClickAddSpace() {
-                this.dialogVisibleGarage = true
-                this.isEdited = false;
-            },
-            /* 取消修改车库的编辑信息*/
-            handleCancel(formName) {
-                this.editCarData =  {
-                    name: '',
-                    location: '',
-                    description: '',
-                    total: '',
-                    price: '',
-                    priceTime: ''
-                }
-                this.$refs[formName].clearValidate()
-                this.dialogVisibleGarage = false
+                this.dialogVisibleEdit = true;
+                this.getGarageList()
             },
 
-            // 确认提交 新增/编辑车位按钮
-            handleSubmit() {
-                this.$refs['info'].validate(valid => {
-                    if (valid) {
-                        this.loading = true;
-                        let api = this.isEdited ? 'car.updateCar' : 'car.insertCar'
-                        apiDataFilter.request({
-                            apiPath: api,
-                            method:'post',
-                            data: {
-                                carName: this.infoData.carName,
-                                carType: this.infoData.carType,
-                                carPrice: this.infoData.carPrice,
-                                carPriceTime: this.infoData.carPriceTime,
-                                garageId: parseInt(this.garageId)
-                            },
-                            successCallback: (res) => {
-                                this.loading = false;
-                                this.$notify({
-                                    title: '成功',
-                                    message: this.isEdited ? '修改成功' : '添加成功',
-                                    type: "success"
-                                });
-                                this.dialogVisibleGarage = false;
-                                this.infoData = {
-                                    carName: '',
-                                    carType: '',
-                                    carPrice: '',
-                                    carPriceTime: ''
-                                }
-                                this.getCarList();
-                            },
-                            errorCallback: (err) => {
-                                this.$notify.error({
-                                    title: this.isEdited ? '编辑失败' : '添加失败',
-                                    message: err.data.msg
-                                });
-                                this.loading = false;
-                                this.dialogVisibleGarage = false;
-                                this.infoData = {
-                                    carName: '',
-                                    carType: '',
-                                    carPrice: '',
-                                    carPriceTime: ''
-                                }
-                            },
-                            completeCallback: () => {
-                                this.loading = false
-                            }
-                        })
-                    }
-                })
-            },
-
-            // 取消修改车库信息
+            // 关闭修改车库dialog
             handleCancelEdit(formName) {
                 this.$refs[formName].clearValidate()
                 this.dialogVisibleEdit = false
@@ -492,7 +396,7 @@
                 }
             },
 
-            // 提交修改的车库信息
+            // 提交修改的车库
             handleSubmitEdit() {
                 this.$refs['edit_info'].validate(valid => {
                     if (valid) {
@@ -535,6 +439,158 @@
                 })
             },
 
+            // 获取某个车库信息
+            getGarageList() {
+                apiDataFilter.request({
+                    apiPath: 'garage.getGarage',
+                    method: 'post',
+                    data: {
+                        garageId: parseInt(this.garageId)
+                    },
+                    successCallback: (res) => {
+                        this.garageObj = res.data;
+                        // this.editCarData = res.data;
+                        this.editCarData.name = res.data.garageName;
+                        this.editCarData.location = res.data.garageLocation;
+                        this.editCarData.description = res.data.garageDescription;
+                        this.editCarData.total = res.data.garageTotal;
+                        this.editCarData.price = res.data.garagePrice;
+                        this.editCarData.priceTime = res.data.garagePricetime;
+                    },
+                    errorCallback: (err) => {
+
+                    },
+                })
+            },
+
+
+            // 添加车位
+            handleClickAddSpace() {
+                this.dialogVisibleGarage = true
+                this.isEdited = false;
+            },
+
+            // 修改车位
+            handleEdit(index) {
+                this.isEdited = true
+                this.dialogVisibleGarage = true;
+                // console.log(this.tableData[index])
+                this.infoData = {
+                    carName: this.tableData[index].carName,
+                    carType: this.tableData[index].carType,
+                    carPrice: this.tableData[index].carPrice,
+                    carPriceTime: this.tableData[index].carPriceTime,
+                    carLocation: this.tableData[index].carLocation
+                }
+            },
+
+            /* 关闭添加/修改车位dialog */
+            handleCancel(formName) {
+                this.$refs[formName].clearValidate()
+                this.infoData =  {
+                    carName: '',
+                    carType: '',
+                    carPrice: '',
+                    carPriceTime: '',
+                    carLocation: ''
+                }
+                this.dialogVisibleGarage = false  // 关闭添加/修改车位dialog
+            },
+
+            // 删除车位
+            deleteData(id) {
+                this.$confirm(
+                    "您确认要删除此条数据吗？",
+                    "提示",
+                    {
+                        confirmButtonText: "确认",
+                        cancelButtonText: "取消",
+                        type: 'warning'
+                    }
+                ).then(() => {
+                    apiDataFilter.request({
+                        apiPath: 'car.deleteCar',
+                        method: 'post',
+                        data: {
+                            carId: id
+                        },
+                        successCallback: (res) => {
+                            // 成功
+                            this.$notify({
+                                title: '成功',
+                                message: '删除车位成功',
+                                type: "success"
+                            });
+                            this.getCarList()
+                        },
+                        errorCallback: (err) => {
+                            // 失败
+                            this.$notify.error({
+                                title: '删除失败',
+                                message: err.data.msg
+                            });
+                            this.getCarList()
+                        },
+                    })
+                })
+            },
+
+            // 确认提交 新增/编辑车位
+            handleSubmit() {
+                this.$refs['info'].validate(valid => {
+                    if (valid) {
+                        this.loading = true;
+                        let api = this.isEdited ? 'car.updateCar' : 'car.insertCar'
+                        apiDataFilter.request({
+                            apiPath: api,
+                            method:'post',
+                            data: {
+                                carName: this.infoData.carName,
+                                carType: this.infoData.carType,
+                                carPrice: this.infoData.carPrice,
+                                carPriceTime: this.infoData.carPriceTime,
+                                carLocation: this.infoData.carLocation,
+                                garageId: parseInt(this.garageId)
+                            },
+                            successCallback: (res) => {
+                                this.loading = false;
+                                this.$notify({
+                                    title: '成功',
+                                    message: this.isEdited ? '修改成功' : '添加成功',
+                                    type: "success"
+                                });
+                                this.dialogVisibleGarage = false;
+                                this.infoData = {
+                                    carName: '',
+                                    carType: '',
+                                    carPrice: '',
+                                    carPriceTime: ''
+                                }
+                                this.getCarList();
+                            },
+                            errorCallback: (err) => {
+                                this.$notify.error({
+                                    title: this.isEdited ? '编辑失败' : '添加失败',
+                                    message: err.data.msg
+                                });
+                                this.loading = false;
+                                this.dialogVisibleGarage = false;
+                                this.infoData = {
+                                    carName: '',
+                                    carType: '',
+                                    carPrice: '',
+                                    carPriceTime: ''
+                                }
+                            },
+                            completeCallback: () => {
+                                this.loading = false
+                            }
+                        })
+                    }
+                })
+            },
+
+            // 获取车位列表
             getCarList() {
                 this.loading = true;
                 apiDataFilter.request({
@@ -548,6 +604,7 @@
                     successCallback: (res) => {
                         this.loading = false;
                         this.tableData = res.data.list;
+                        // this.infoDa
                         this.pageTotal = res.data.total;
                     },
                     errorCallback: (err) => {
@@ -556,21 +613,6 @@
                 })
             },
 
-            /*getGarageList() {
-                apiDataFilter.request({
-                    apiPath: 'garage.getGarageList',
-                    method: 'post',
-                    data: {
-                        garageId: parseInt(this.garageId)
-                    },
-                    successCallback: (res) => {
-                        this.garageObj = res.data.garageInfoList;
-                    },
-                    errorCallback: (err) => {
-
-                    },
-                })
-            }*/
         }
     }
 </script>

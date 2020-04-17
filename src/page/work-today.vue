@@ -70,7 +70,7 @@
             }
         },
         created() {
-            // this.getTodayOrderList()
+            this.getTodayOrderList()
         },
         methods: {
             /*handleSizeChange(val) {
