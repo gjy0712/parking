@@ -120,6 +120,7 @@
                                 newPassword: this.formData.newPassword
                             },
                             successCallback: (res) => {
+                                this.optionsLoading = false
                                 this.$message.success('密码修改成功，请重新登录！')
                                 store.dispatch('LogOut').then(() => {
                                     location.reload() // 为了重新实例化vue-router对象 避免bug
@@ -134,7 +135,9 @@
                                 }*/
                             },
                             errorCallback: (err) => {
-                                this.$message.error(err.msg)
+                                this.$message.error(err.data.msg)
+                                this.optionsLoading = false
+
                             },
                             completeCallback: () => {
                                 this.optionsLoading = false
