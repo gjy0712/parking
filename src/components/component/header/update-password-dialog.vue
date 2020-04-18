@@ -135,7 +135,7 @@
                                 }*/
                             },
                             errorCallback: (err) => {
-                                this.$message.error(err.data.msg)
+                                this.$message.error('修改密码失败，请重新输入！')
                                 this.optionsLoading = false
 
                             },
