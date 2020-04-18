@@ -16,8 +16,8 @@
                         <el-select v-model="searchObj.carLocation" class="search-input" clearable @change="handleSearch()" size="small">
                             <el-option
                                     v-for="item in options"
-                                    :key="item.value"
-                                    :label="item.label"
+                                    :key="item.id"
+                                    :label="item.value"
                                     :value="item.value">
                             </el-option>
                         </el-select>
@@ -135,6 +135,7 @@
 
 <script>
     import { PageHeader } from "../../components/public";
+    import apiDataFilter from "../../utils/apiDataFilter";
 
     export default {
         name: "vehicle-storage",
@@ -149,24 +150,7 @@
                 carTotal: '31',
                 location: '9号楼一层',
                 description: '',
-                options: [
-                    {
-                        value: '1',
-                        label: 'D1'
-                    },
-                    {
-                        value: '2',
-                        label: 'G1'
-                    },
-                    {
-                        value: '3',
-                        label: 'F1'
-                    },
-                    {
-                        value: '4',
-                        label: 'E1'
-                    }
-                ],
+                options: {},
                 carList: [
                     {
                         name: 'E1--1',
@@ -347,6 +331,9 @@
                 }
             }
         },
+        created() {
+            this.getGarageNameList()
+        },
         methods: {
             handleSearch() {
 
@@ -360,6 +347,20 @@
             },
             handleSubmit() {
 
+            },
+            getGarageNameList() {
+                apiDataFilter.request({
+                    apiPath: 'garage.getGarageNameList',
+                    method: 'POST',
+                    data: '',
+                    successCallback: (res) => {
+                        this.options = res.data;
+                        console.log(this.options)
+                    },
+                    errorCallback: (res) => {
+
+                    }
+                })
             }
         }
     }
@@ -372,7 +373,6 @@
         .search-box {
             // background-color: @gray-color;
             padding: 20px 0;
-            margin-top: 20px;
 
             .el-row {
                 padding-left: 20px;

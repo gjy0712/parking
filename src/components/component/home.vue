@@ -5,9 +5,7 @@
         <div class="stop-content-box" :class="{'content-collapse':collapse}">
             <div class="stop-content">
                 <transition name="move" mode="out-in">
-                    <keep-alive >
-                        <router-view></router-view>
-                    </keep-alive>
+                    <router-view></router-view>
                 </transition>
                 <el-backtop target=".stop-content"></el-backtop>
             </div>

@@ -83,9 +83,9 @@
                     <el-form-item label="描述：" prop="garageDescription">
                         <el-input v-model.trim="newCarData.garageDescription" placeholder="请输入车库描述（可以不填）"></el-input>
                     </el-form-item>
-                    <el-form-item label="车位总数：" prop="garageTotal">
+                    <!--<el-form-item label="车位总数：" prop="garageTotal">
                         <el-input v-model.trim="newCarData.garageTotal" placeholder="请输入车位数量"></el-input>
-                    </el-form-item>
+                    </el-form-item>-->
                     <el-form-item label="车位价格：" prop="garagePrice">
                         <el-input class="car-price" v-model.trim="newCarData.garagePrice" placeholder="价格"></el-input>
                         元/每

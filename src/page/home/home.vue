@@ -13,18 +13,18 @@
                 <div class="box-title">{{name}},欢迎您使用停车场收费系统!</div>
                 <div class="box-description">{{description}}</div>
                 <div class="box-button">
-                    <el-button type="primary" icon="el-icon-refresh" size="small" @click="getList">刷新</el-button>
+                    <el-button type="primary" icon="el-icon-refresh" size="small" @click="getRefresh">刷新</el-button>
                 </div>
                 <div class="count-box">
                     <div class="count-content">
-                        当前停车：<span class="count-color">{{number}}个</span>
+                        当前停车：<span class="count-color">{{totalCarInfo.usingCarNum}}辆</span>
                         <div class="count-space"></div>
-                        空余车位：<span class="count-green-color">{{freeSpace}}个</span>
+                        空余车位：<span class="count-green-color">{{totalCarInfo.unUsedCarNum}}个</span>
                     </div>
                     <div class="count-content">
-                        拥有车库：<span>{{garage}}辆</span>
+                        拥有车库：<span>{{totalCarInfo.garageTotalNum}}个</span>
                         <div class="count-space"></div>
-                        拥有车位：<span>{{ownSpace}}个</span>
+                        拥有车位：<span>{{totalCarInfo.carTotalNum}}个</span>
                     </div>
                 </div>
             </div>
@@ -66,18 +66,22 @@
     import { USER } from '@/config/webstore'
     import SearchDialog from "./components/search-dialog";
     import CalculateFeeDialog from "./components/calculate-fee-dialog";
+    import apiDataFilter from "../../utils/apiDataFilter";
 
     export default {
         name: "home",
         components: {CalculateFeeDialog, SearchDialog, PageHeader },
         data() {
             return {
+                totalCarInfo: {
+                    usingCarNum: '',   // 使用车位
+                    unUsedCarNum: '',   //空闲车位
+                    garageTotalNum: '',  // 总车库
+                    carTotalNum: ''  //总车位
+                },
                 name: '',
                 description: '',
-                number: '4',
-                garage: '4',
-                freeSpace: '111',
-                ownSpace: '115'
+
             }
         },
         mounted() {
@@ -88,9 +92,14 @@
             }
         },
         created() {
-
+            this.getTotalCarInfo()
+            this.getMessageList()
         },
         methods: {
+            getRefresh() {
+                this.getTotalCarInfo()
+                this.getMessageList()
+            },
             handleCarInfo() {
                 this.$router.push('/carInfo')
             },
@@ -100,8 +109,31 @@
             handleSearch() {
                 this.$refs['search_ref'].showDialog();
             },
-            getList() {
+            getTotalCarInfo() {
+                apiDataFilter.request({
+                    apiPath: 'garage.getTotalCarInfo',
+                    method: 'post',
+                    data: {},
+                    successCallback: (res) => {
+                        this.totalCarInfo = res.data;
+                        // this.infoDa
+                    },
+                    errorCallback: (err) => {
+                    },
+                })
+            },
+            getMessageList() {
+                apiDataFilter.request({
+                    apiPath: 'message.getMessageList',
+                    method: 'POST',
+                    data: '',
+                    successCallback: (res)=> {
 
+                    },
+                    errorCallback: (res) => {
+
+                    }
+                })
             }
         }
 

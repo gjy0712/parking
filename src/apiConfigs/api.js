@@ -18,7 +18,8 @@ export default {
             insertUser: '/user/insertUser', // 新增用户
             updateUser: '/user/updateUser', // // 编辑用户信息
             updatePassword: '/user/updatePassword', // 修改密码
-            getUserList: '/user/getUserList', // // 获取用户列表
+            getUserList: '/user/getUserList', // // 获取用户列表,
+            searchUser: '/user/searchUser' // 查询用户
         },
         garage: {
             // 获取车库列表
@@ -27,6 +28,9 @@ export default {
             deleteGarage: '/garage/deleteGarage', // 删除车库
             updateGarage: '/garage/updateGarage', // 更新车库信息,
             getGarage: '/garage/getGarage', //修改车库信息
+            getTotalCarInfo: '/garage/getTotalCarInfo', // 停车场车库车位信息
+            getGarageNameList: '/garage/getGarageNameList' // 获取车库名列表
+
         },
         car: {
             // 车位信息

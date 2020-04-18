@@ -29,11 +29,11 @@
                 </el-col>
                 <el-col :span="6">
                     <div class="grid-content">
-                        姓名：
+                        昵称：
                         <el-input size="small" v-model="searchObj.name"
                                   @blur="handleSearch"
                                   @keyup.enter.native="handleSearch"
-                                  placeholder="请输入姓名">
+                                  placeholder="请输入昵称">
                         </el-input>
                     </div>
                 </el-col>
@@ -55,17 +55,17 @@
             </div>
             <div class="table-box">
                 <el-table :data="tableData" v-loading="loading" stripe style="width: 100%" class="el-table-reset-lite-style">
-                    <el-table-column type="index" label="#" width="30"></el-table-column>
+                    <el-table-column type="index" label="#" width="50"></el-table-column>
                     <el-table-column prop="code" label="工号"></el-table-column>
                     <el-table-column prop="username" label="账号"></el-table-column>
-                    <el-table-column prop="name" label="姓名"></el-table-column>
+                    <el-table-column prop="name" label="昵称"></el-table-column>
                     <el-table-column prop="sex" label="性别"></el-table-column>
                     <el-table-column prop="email" label="邮箱" width="180"></el-table-column>
                     <el-table-column prop="phone" label="电话" width="130"></el-table-column>
                     <el-table-column prop="type" label="权限">
                         <template slot-scope="scope">
-                            <el-button v-if="scope.row.type==='ADMIN' " type="success" size="mini" @click="changeAuthority(scope.row, scope.row.id)">管理员</el-button>
-                            <el-button v-else type="danger" size="mini" @click="changeAuthority(scope.row, scope.row.id)">禁用</el-button>
+                            <el-button v-if="scope.row.type==='ADMIN' " type="success" size="mini" @click="changeAuthority(scope.row, scope.row.id)">管理</el-button>
+                            <el-button v-else type="danger" size="mini" @click="changeAuthority(scope.row, scope.row.id)">职员</el-button>
                         </template>
                     </el-table-column>
                     <el-table-column prop="status" label="状态">
@@ -179,6 +179,7 @@
             return {
                 loading :false,
                 isEdited: true,
+                disabled: false,
                 searchObj: {
                     code: '',
                     username: '',
@@ -186,7 +187,7 @@
                 },
                 tableData: [],
                 currentPage: 1,
-                pageSize: 100,
+                pageSize: 10,
                 pageTotal: 0,
                 dialogVisibleAddEmployee: false,
                 employeeData: {
@@ -194,7 +195,7 @@
                     password: '',
                     code: '',
                     name: '',
-                    sex: '',
+                    sex: '男',
                     email: '',
                     phone: '',
                     description: ''
@@ -233,7 +234,7 @@
                     } else {
                         const reg = /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+/;
                         if (!reg.test(value)) {
-                            callback(new Error('输入的联系邮箱必须包含@'));
+                            callback(new Error('邮箱格式不正确！'));
                         } else {
                             callback();
                         }
@@ -294,7 +295,27 @@
             },
             // 搜索查询
             handleSearch() {
-                this.getUserList()
+                this.loading = true;
+                apiDataFilter.request({
+                    apiPath: 'user.searchUser',
+                    method: 'POST',
+                    data: {
+                        code: this.searchObj.code,
+                        username: this.searchObj.username,
+                        name: this.searchObj.name,
+                        pageNum: this.currentPage,
+                        pageSize: this.pageSize
+                    },
+                    successCallback: (res) => {
+                        this.loading = false;
+                        this.tableData = res.data.list
+                        this.pageTotal = res.data.total;
+                    },
+                    errorCallback: (res) => {
+                        this.loading = false;
+
+                    }
+                })
             },
             // 重置按钮
             handleReset() {
@@ -310,12 +331,18 @@
             },
             // 管理员与职员修改
             changeAuthority(row, id){
+                let type = ''
+                if(row.type === 'ADMIN'){
+                    type = 'EMPLOYEE'
+                }else {
+                    type = 'ADMIN'
+                };
                 apiDataFilter.request({
                     apiPath: 'user.updateType',
                     method: 'post',
                     data: {
-                        userID: parseInt(id),
-                        type: row.type
+                        userId: parseInt(id),
+                        userTypeEnum: type
                     },
                     successCallback: (res) => {
                         // 成功
@@ -338,12 +365,18 @@
             },
             // 状态开关 可用禁用
             changeStatus(row, id) {
+                let status = ''
+                if(row.status === 0){
+                    status = 1
+                }else {
+                    status = 0
+                }
                 apiDataFilter.request({
                     apiPath: 'user.updateStatus',
                     method: 'post',
                     data: {
                         userID: parseInt(id),
-                        status: parseInt(row.status)
+                        status: status
                     },
                     successCallback: (res) => {
                         // 成功
@@ -404,6 +437,16 @@
 
             // 关闭dialog
             handleCancel(formName) {
+                this.employeeData = {
+                    username: '',
+                    password: '',
+                    code: '',
+                    name: '',
+                    sex: '男',
+                    email: '',
+                    phone: '',
+                    description: ''
+                }
                 this.$refs[formName].clearValidate()
                 this.dialogVisibleAddEmployee = false
             },
@@ -438,7 +481,7 @@
                                     password: '',
                                     code: '',
                                     name: '',
-                                    sex: '',
+                                    sex: '男',
                                     email: '',
                                     phone: '',
                                     description: ''
@@ -449,9 +492,10 @@
                                 this.loading = false
                                 // 失败
                                 this.$notify.error({
-                                    title: '失败',
-                                    message: '添加失败'
+                                    title: '添加失败',
+                                    message: err.data.msg
                                 });
+                                this.dialogVisibleAddEmployee = false
                                 this.getUserList()
                             },
                         })

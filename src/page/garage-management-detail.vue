@@ -48,20 +48,20 @@
                         </el-table-column>
                         <el-table-column prop="carStatus" label="状态">
                             <template  slot-scope="scope">
-                                <span v-if="scope.row.carStatus=== 0" style="color: green;font-size: 10px">空闲</span>
-                                <span v-else-if="scope.row.carStatus=== 1" style="color: red;font-size: 10px">有车</span>
+                                <span v-if="scope.row.carStatus=== 0" style="color: red;font-size: 10px">有车</span>
+                                <span v-else-if="scope.row.carStatus=== 1" style="color: green;font-size: 10px">空闲</span>
 <!--                                {{carStatus(scope.row.carStatus)}}-->
                             </template>
                         </el-table-column>
                         <el-table-column label="操作" width="200">
                             <template slot-scope="scope">
-                                <el-button type="text" style="color: #61BD85;"
+                                <el-button type="text"
+                                           icon="el-icon-edit"
                                            @click="handleEdit(scope.$index)">
-                                    修改
                                 </el-button>
-                                <el-button type="text" style="color: #F14A56;"
+                                <el-button type="text"
+                                           icon="el-icon-delete"
                                            @click="deleteData(scope.row.id)">
-                                    删除
                                 </el-button>
                             </template>
                         </el-table-column>
@@ -244,7 +244,7 @@
                 // 车位
                 infoData: {
                     carName: '',
-                    carType: '',
+                    carType: '小车位',
                     carPrice: '',
                     carPriceTime: '',
                     carLocation: ''
@@ -293,8 +293,8 @@
                 };
                 return {
                     carName: [
-                        { required: true, message: "车库名称不能为空", trigger: 'blur' },
-                        { min: 2, max: 12, message: "车库名称长度为2-12位", trigger: 'blur' }
+                        { required: true, message: "车位名称不能为空", trigger: 'blur' },
+                        { min: 2, max: 12, message: "车位名称长度为2-12位", trigger: 'blur' }
                     ],
                     carPrice: [
                         { required: true, message: "价格不能为空", trigger: 'blur' },
@@ -360,10 +360,10 @@
                 let text = "";
                 switch(type){
                     case 0:
-                        text = '空闲';
+                        text = '有车';
                         break;
                     case 1:
-                        text = '有车';
+                        text = '空闲';
                         break;
                 }
                 return text;
@@ -489,7 +489,7 @@
                 this.$refs[formName].clearValidate()
                 this.infoData =  {
                     carName: '',
-                    carType: '',
+                    carType: '小车位',
                     carPrice: '',
                     carPriceTime: '',
                     carLocation: ''
@@ -512,7 +512,8 @@
                         apiPath: 'car.deleteCar',
                         method: 'post',
                         data: {
-                            carId: id
+                            carId: id,
+                            garageId: this.garageId
                         },
                         successCallback: (res) => {
                             // 成功
@@ -562,7 +563,7 @@
                                 this.dialogVisibleGarage = false;
                                 this.infoData = {
                                     carName: '',
-                                    carType: '',
+                                    carType: '小车位',
                                     carPrice: '',
                                     carPriceTime: ''
                                 }
@@ -577,7 +578,7 @@
                                 this.dialogVisibleGarage = false;
                                 this.infoData = {
                                     carName: '',
-                                    carType: '',
+                                    carType: '小车位',
                                     carPrice: '',
                                     carPriceTime: ''
                                 }

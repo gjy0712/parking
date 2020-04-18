@@ -15,8 +15,8 @@
                      label-position="left"
                      label-width="80px"
                      class="login-content">
-                <el-form-item prop="topic" label="标题：">
-                    <el-input v-model="annForm.topic" style="width: 30%"
+                <el-form-item prop="title" label="标题：">
+                    <el-input v-model="annForm.title" style="width: 30%"
                               placeholder="请输入标题"
                               @keyup.enter.native="submitForm('annForm')">
                     </el-input>
@@ -46,7 +46,22 @@
         </div>
 
         <div class="message-content">
-            <div class="title">公告</div>
+            <div class="message-title">公告列表</div>
+            <div class="message-box" v-for="item in messageInfoList" :key="item.id">
+                <div class="title">
+                    {{item.title}}
+                    <p class="name">
+                        {{item.name}}
+                    </p>
+                </div>
+                <div class="content">{{item.content}}</div>
+                <div class="create-time">
+                    {{item.creattime}}
+                    <div style="width: 30px;display: inline-block"></div>
+                    <el-button type="text" style="color: red;" size="mini" @click="handleDelete(item.id)">删除</el-button>
+                </div>
+            </div>
+
         </div>
     </div>
 </template>
@@ -64,16 +79,17 @@
             return {
                 loading: false,
                 annForm: {
-                    topic: '',
+                    title: '',
                     content: ''
                 },
-                userId: ''
+                userId: '',
+                messageInfoList: []
             }
         },
         computed: {
             rules() {
                 return {
-                    topic: [
+                    title: [
 
                     ],
                     content: [
@@ -101,7 +117,7 @@
                             method: 'post',
                             data: {
                                 userID: parseInt(this.userId),
-                                title: this.annForm.topic,
+                                title: this.annForm.title,
                                 content: this.annForm.content
                             },
                             successCallback: (res) => {
@@ -135,17 +151,40 @@
                     }
                 })
             },
+            // 删除公告
+            handleDelete(id) {
+                apiDataFilter.request({
+                    apiPath: 'message.deleteMessage',
+                    method: 'POST',
+                    data: {
+                        messageId: id
+                    },
+                    successCallback: (res)=> {
+                        this.$message.success('删除成功')
+                        this.getList()
+
+                    },
+                    errorCallback: (res) => {
+                        this.$message.success('删除失败')
+                        this.getList()
+
+
+                    }
+                })
+            },
             // 获取公告
             getList() {
+                this.loading = true;
                 apiDataFilter.request({
                     apiPath: 'message.getMessageList',
                     method: 'POST',
                     data: '',
                     successCallback: (res)=> {
-
+                        this.loading = false
+                        this.messageInfoList = res.data.messageInfoList
                     },
                     errorCallback: (res) => {
-
+                        this.loading = false
                     }
                 })
             }
@@ -163,6 +202,44 @@
 
         .pop-box {
             padding: 30px;
+        }
+
+        .message-content {
+            margin-top: 30px;
+            padding: 30px;
+            .message-title {
+                font-size: 25px;
+                color: #409eff;
+                width: 110px;
+                margin-left: 40px;
+                margin-bottom: 20px;
+            }
+            .message-box {
+                background-color: #e9e9e9;
+                border-bottom: 1.5px solid #E7F6FB;
+                border-radius: 3px;
+                padding: 5px 0 0 10px;
+                width: 900px;
+                margin: 0 auto;
+                .name {
+                    color: #305e67;
+                    font-size: 14px;
+                    display: inline-block;
+                    padding-left: 80px;
+                    height: 50px;
+                    line-height: 50px;
+                }
+                .title {
+                    font-size: 17px;
+                    color: #757575;
+                }
+                .content {
+                    height: 100px;
+                    padding: 10px 0 0 40px;
+                    color: #a7a7a7;
+                }
+            }
+
         }
     }
 </style>

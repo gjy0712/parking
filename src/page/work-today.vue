@@ -63,7 +63,7 @@
                     }
                 ],
                 currentPage: 1,
-                pageSize: 100,
+                pageSize: 10,
                 pageTotal: 0,
                 number: '1',
                 total: '9.0'
