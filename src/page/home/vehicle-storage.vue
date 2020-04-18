@@ -479,6 +479,7 @@
                 this.dialogCarInfo = false
 
             },
+
             // 获取车库名称
             getGarageNameList() {
                 apiDataFilter.request({
@@ -487,6 +488,7 @@
                     data: '',
                     successCallback: (res) => {
                         this.options = res.data.garageNameAndIdInfos;
+                        this.getCarList()
                         // this.searchObj.garageName = res.data.garageNameAndIdInfos[0].garageName;
                     },
                     errorCallback: (res) => {
@@ -526,7 +528,10 @@
                         pageSize: 100
                     },
                     successCallback: (res) => {
-                        this.carList = res.data.list;
+                        if(res.data) {
+                            this.carList = res.data.list;
+
+                        }
                     },
                     errorCallback: (res) => {
 

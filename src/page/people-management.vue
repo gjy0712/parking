@@ -412,7 +412,7 @@
                         apiPath: 'user.deleteUser',
                         method: 'post',
                         data: {
-                            userID: id
+                            userId: id
                         },
                         successCallback: (res) => {
                             // 成功
