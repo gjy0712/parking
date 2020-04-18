@@ -35,33 +35,33 @@
 
             <div class="count-box">
                 <div class="count-content">
-                    车牌号：<span class="count-color"></span>
+                    车牌号：<span class="count-color">{{feeList.province}}{{feeList.carnumber}}</span>
                 </div>
                 <div class="count-content">
-                    车库：<span class="count-color"></span>
+                    车库：<span class="count-color">{{feeList.garageName}}</span>
                     <div class="count-space"></div>
-                    车位：<span class="count-green-color"></span>
+                    车位：<span class="count-color">{{feeList.carName}}</span>
+                </div>
+                <!--<div class="count-content">
+                    车位类型：<span class="count-color">{{feeList.province}}</span>
+                </div>-->
+                <div class="count-content">
+                    入库时间：<span class="count-color">{{feeList.starttime}}</span>
+                    <div style="display: inline-block;width: 20px"></div>
+                    出库时间：<span class="count-color">{{feeList.endtime}}</span>
                 </div>
                 <div class="count-content">
-                    车位类型：<span class="count-color"></span>
-                </div>
-                <div class="count-content">
-                    入库时间：<span></span>
+                    价格：<span class="count-color">{{feeList.carPrice}}元/{{feeList.carPriceTime}}小时</span>
                     <div class="count-space"></div>
-                    出库时间：<span></span>
+                    停车时间：<span class="count-color">{{feeList.time}}小时</span>
                 </div>
                 <div class="count-content">
-                    价格：<span></span>
+                    操作人：<span class="count-color">{{feeList.userName}}</span>
                     <div class="count-space"></div>
-                    停车时间：<span></span>
-                </div>
-                <div class="count-content">
-                    操作人：<span></span>
-                    <div class="count-space"></div>
-                    工号：<span></span>
+                    工号：<span class="count-color">{{feeList.userCode}}</span>
                 </div>
                 <div class="count-content count-total">
-                    总计：<span class="count-color"></span>
+                    总计：<span class="total-color">{{feeList.cost}}</span>
                 </div>
             </div>
         </div>
@@ -92,7 +92,7 @@
                 dialogCalculateFee: false,
                 loading: false,
                 calculateData: {
-                    province: '',
+                    province: '京',
                     carNumber: ''
                 },
                 options: [
@@ -221,14 +221,14 @@
                         label: '新'
                     }
                 ],
-                code: ''
+                feeList: {}
+
             }
         },
         computed: {
             calculateRule() {
                 const validateProvince = (rule, value, callback) => {
                     let carNumber = this.$refs.carNumber.value;
-                    console.log(value + carNumber)
                     if( value === '') {
                         callback(new Error('车牌省市不能为空'));
                     }else if( carNumber === '') {
@@ -262,6 +262,7 @@
                     province: '',
                     carNumber: ''
                 }
+                this.feeList = ''
             },
 
             // 结算
@@ -274,23 +275,20 @@
                             carnumber: this.calculateData.carNumber
                         }
                         apiDataFilter.request({
-                            apiPath: 'order.getCarOrder',
+                            apiPath: 'order.updateCarOrder',
                             method: 'post',
                             data: param,
                             successCallback: (res) => {
                                 this.loading = false;
-                                this.calculateData = {
-                                    province: '',
-                                    carNumber: ''
+                                if(res.data) {
+                                    this.feeList = res.data
+                                }else {
+                                    this.$message.error('车辆不存在，请重新输入已有的车牌号!')
                                 }
                             },
                             errorCallback: (err) => {
                                 this.loading = false;
-                                // this.getGarageList()
-                                this.calculateData = {
-                                    province: '',
-                                    carNumber: ''
-                                }
+                                this.$message.error('车辆不存在，请重新输入已有的车牌号!')
                             },
                         })
                     }
@@ -320,12 +318,10 @@
                 .count-content {
 
                     .count-color {
-                        /*color: #ff4400;*/
+                        color: #ff4400;
+                        font-size: 12px;
                     }
 
-                    .count-green-color {
-                        /*color: #00B51D;*/
-                    }
                     .count-space {
                         display: inline-block;
                         width: 65px;
@@ -334,6 +330,11 @@
 
                 .count-total {
                     margin-top: 20px;
+
+                    .total-color {
+                        color: #ff5000;
+                        font-weight: bolder;
+                    }
                 }
             }
         }

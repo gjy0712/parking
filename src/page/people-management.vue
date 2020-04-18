@@ -375,7 +375,7 @@
                     apiPath: 'user.updateStatus',
                     method: 'post',
                     data: {
-                        userID: parseInt(id),
+                        userId: parseInt(id),
                         status: status
                     },
                     successCallback: (res) => {

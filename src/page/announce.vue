@@ -12,34 +12,32 @@
             <el-form :model="annForm"
                      :rules="rules"
                      ref="annForm"
-                     label-position="left"
-                     label-width="80px"
+                     label-width="70px"
                      class="login-content">
                 <el-form-item prop="title" label="标题：">
-                    <el-input v-model="annForm.title" style="width: 30%"
+                    <el-input v-model="annForm.title"
+                              size="small"
                               placeholder="请输入标题"
                               @keyup.enter.native="submitForm('annForm')">
                     </el-input>
                 </el-form-item>
                 <el-form-item prop="content" label="内容：">
-                    <el-input style="width: 50%"
-                              type="textarea"
-                              maxlength="30"
-                              :rows="3"
+                    <el-input type="textarea"
+                              size="small"
+                              :rows="10"
                               placeholder="请输入内容"
                               v-model="annForm.content"
                               @keyup.enter.native="submitForm('annForm')"
                     >
                     </el-input>
                 </el-form-item>
-                <el-form-item class="login-btn" label-width="0">
+                <el-form-item style="text-align: center" class="login-btn" label-width="0">
                     <el-button type="primary"
-                               icon="el-icon-plus"
                                class="custom-button_long"
-                               size="medium"
+                               size="small"
                                :loading="loading"
                                @click="submitForm('annForm')">
-                        添加
+                        发布公告
                     </el-button>
                 </el-form-item>
             </el-form>
@@ -48,18 +46,13 @@
         <div class="message-content">
             <div class="message-title">公告列表</div>
             <div class="message-box" v-for="item in messageInfoList" :key="item.id">
-                <div class="title">
-                    {{item.title}}
-                    <p class="name">
-                        {{item.name}}
-                    </p>
-                </div>
+                <span class="title">{{item.title}}</span>
                 <div class="content">{{item.content}}</div>
-                <div class="create-time">
-                    {{item.creattime}}
-                    <div style="width: 30px;display: inline-block"></div>
-                    <el-button type="text" style="color: red;" size="mini" @click="handleDelete(item.id)">删除</el-button>
-                </div>
+                <div class="name">{{item.name}}</div>
+                <span class="create-time">{{item.creattime}}</span>
+                <!--<el-button class="delete" type="text" size="mini" @click="handleDetail(item.id)">详情</el-button>-->
+                <el-button class="delete" type="text" size="mini" @click="handleDelete(item.id)">删除</el-button>
+
             </div>
 
         </div>
@@ -90,9 +83,11 @@
             rules() {
                 return {
                     title: [
+                        { required: true, message: "标题不能为空", trigger: 'blur' },
 
                     ],
                     content: [
+                        { required: true, message: "内容不能为空", trigger: 'blur' },
 
                     ]
                 }
@@ -153,24 +148,35 @@
             },
             // 删除公告
             handleDelete(id) {
-                apiDataFilter.request({
-                    apiPath: 'message.deleteMessage',
-                    method: 'POST',
-                    data: {
-                        messageId: id
-                    },
-                    successCallback: (res)=> {
-                        this.$message.success('删除成功')
-                        this.getList()
-
-                    },
-                    errorCallback: (res) => {
-                        this.$message.success('删除失败')
-                        this.getList()
-
-
+                this.$confirm(
+                    "您确认要删除此条数据吗？",
+                    "提示",
+                    {
+                        confirmButtonText: "确认",
+                        cancelButtonText: "取消",
+                        type: 'warning'
                     }
+                ).then(() => {
+                    apiDataFilter.request({
+                        apiPath: 'message.deleteMessage',
+                        method: 'POST',
+                        data: {
+                            messageId: id
+                        },
+                        successCallback: (res)=> {
+                            this.$message.success('删除成功')
+                            this.getList()
+
+                        },
+                        errorCallback: (res) => {
+                            this.$message.success('删除失败')
+                            this.getList()
+
+
+                        }
+                    })
                 })
+
             },
             // 获取公告
             getList() {
@@ -205,38 +211,49 @@
         }
 
         .message-content {
-            margin-top: 30px;
-            padding: 30px;
+            padding: 10px 0 0 30px;
             .message-title {
-                font-size: 25px;
-                color: #409eff;
-                width: 110px;
-                margin-left: 40px;
+                border-left: 2px solid #20a0ff;
                 margin-bottom: 20px;
+                color: #000;
+                padding-left: 5px;
             }
             .message-box {
-                background-color: #e9e9e9;
-                border-bottom: 1.5px solid #E7F6FB;
-                border-radius: 3px;
-                padding: 5px 0 0 10px;
-                width: 900px;
-                margin: 0 auto;
-                .name {
-                    color: #305e67;
-                    font-size: 14px;
-                    display: inline-block;
-                    padding-left: 80px;
-                    height: 50px;
-                    line-height: 50px;
-                }
+                padding: 0 0 0 10px;
+                position: relative;
+                height: 60px;
+                line-height: 60px;
+                background-color: #CAE1FB;
+                border-radius: 20px;
+                margin-bottom: 10px;
                 .title {
-                    font-size: 17px;
-                    color: #757575;
+                    font-size: 14px;
+                    padding-right: 10px;
                 }
                 .content {
-                    height: 100px;
-                    padding: 10px 0 0 40px;
-                    color: #a7a7a7;
+                    color: #8CB5A9;
+                    padding-right: 10px;
+                    width: 500px;
+                    display: inline-block;
+                }
+                .name {
+                    color: #8CB5A9;
+                    padding-right: 5px;
+                    width: 60px;
+                    display: inline-block;
+                    position: absolute;
+                    left: 550px;
+                }
+                .create-time {
+                    color: #8CB5A9;
+                    display: inline-block;
+                    position: absolute;
+                    left: 610px;
+                }
+                .delete {
+                    position: absolute;
+                    right: 100px;
+                    top: 15px;
                 }
             }
 

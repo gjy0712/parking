@@ -31,6 +31,17 @@
                               placeholder="请输入车牌号码">
                     </el-input>
                 </el-form-item>
+                <div class="save-info" :isvisiable="isvisiable">
+                    车牌号：{{saveInfo.province}}{{saveInfo.carnumber}}
+                    <div class="park-name">
+                        停车人姓名: {{saveInfo.customername}}
+                        <div style="display: inline-block;width: 40px"></div>
+                        停车人电话： {{saveInfo.customerphone}}
+                    </div>
+                    目前在：{{saveInfo.garageName}}车库
+                    <div style="display: inline-block;width: 10px"></div>
+                    {{saveInfo.carName}}车位
+                </div>
                 <!--<el-form-item label="车位名：" prop="carName">
                     <el-input v-model.trim="searchData.carName" placeholder="请输入车位名" style="width: 315px"></el-input>
                 </el-form-item>-->
@@ -53,6 +64,8 @@
 </template>
 
 <script>
+    import apiDataFilter from "../../../utils/apiDataFilter";
+
     export default {
         name: "search-dialog",
         data() {
@@ -61,7 +74,7 @@
                 dialogSearch: false,
                 searchData: {
                     carNumber: '',
-                    carName: ''
+                    province: '京'
                 },
                 options: [
                     {
@@ -189,13 +202,14 @@
                         label: '新'
                     }
                 ],
+                saveInfo: {},
+                isvisiable: false
             }
         },
         computed: {
             searchRule() {
                 const validateProvince = (rule, value, callback) => {
                     let carNumber = this.$refs.carNumber.value;
-                    console.log(value + carNumber)
                     if( value === '') {
                         callback(new Error('车牌省市不能为空'));
                     }else if( carNumber === '') {
@@ -230,7 +244,46 @@
                 this.dialogSearch = false
             },
             handleSubmit() {
+                this.$refs['info'].validate(valid => {
+                    if (valid) {
+                        this.loading = true;
+                        apiDataFilter.request({
+                            apiPath: 'order.searchCarOrder',
+                            method:'post',
+                            data: {
+                                province: this.searchData.province,
+                                carnumber: this.searchData.carNumber,
+                            },
+                            successCallback: (res) => {
+                                this.loading = false;
+                                this.searchData = {
+                                    carNumber: '',
+                                    province: '京',
+                                }
+                                if (res.data === null) {
+                                    this.$message.error('该车辆不存在，请重新搜索！')
+                                }else {
+                                    this.saveInfo = res.data
+                                    this.isvisiable = true
+                                }
 
+                                // this.getCarList();
+                            },
+                            errorCallback: (err) => {
+                                this.$message.error('搜索失败，请重新搜索！')
+                                this.loading = false;
+                                this.searchData = {
+                                    carNumber: '',
+                                    province: '京',
+                                }
+                                // this.getCarList();
+                            },
+                            completeCallback: () => {
+                                this.loading = false
+                            }
+                        })
+                    }
+                })
             }
         }
     }
@@ -240,6 +293,18 @@
     .search-component {
         .pop-box {
             padding: 0 40px;
+
+            .save-info {
+                background-color: #dff0d8;
+                min-height: 30px;
+                border-radius: 5px;
+                padding: 20px;
+                color: #69763d;
+
+                .park-name {
+                    margin: 20px 0;
+                }
+            }
         }
     }
 </style>

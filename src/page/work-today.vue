@@ -13,11 +13,23 @@
             <div class="table-box">
                 <el-table :data="tableData" stripe style="width: 100%" class="el-table-reset-lite-style">
                     <el-table-column type="index" prop="id" label="#"></el-table-column>
-                    <el-table-column prop="numberPlate" label="车牌号"></el-table-column>
-                    <el-table-column prop="startTime" label="开始时间"></el-table-column>
-                    <el-table-column prop="endTime" label="结束时间"></el-table-column>
-                    <el-table-column prop="stopTime" label="停车时长"></el-table-column>
-                    <el-table-column prop="total" label="总价"></el-table-column>
+                    <el-table-column prop="province,carnumber" label="车牌号" width="200">
+                        <template slot-scope="scope">
+                            {{scope.row.province}} {{scope.row.carnumber}}
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="starttime" label="开始时间"></el-table-column>
+                    <el-table-column prop="endtime" label="结束时间"></el-table-column>
+                    <el-table-column prop="time" label="停车时长">
+                        <template slot-scope="scope">
+                            {{scope.row.time}} 小时
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="cost" label="总价">
+                        <template slot-scope="scope">
+                            {{scope.row.cost}} 元
+                        </template>
+                    </el-table-column>
                 </el-table>
 
                 <div class="count-box">
@@ -53,20 +65,13 @@
         components: { PageHeader },
         data() {
             return {
-                tableData: [
-                    {
-                        numberPlate:'赣K 87234',
-                        startTime: '2020-04-14 13-00',
-                        endTime: '2020-04-14 16-00',
-                        total: '9元',
-                        stopTime: '3小时',
-                    }
-                ],
+                loading: false,
+                tableData: [],
                 currentPage: 1,
                 pageSize: 10,
                 pageTotal: 0,
-                number: '1',
-                total: '9.0'
+                number: '0',
+                total: '0.0'
             }
         },
         created() {
@@ -82,19 +87,24 @@
                 this.getTodayOrderList()
             },*/
             getTodayOrderList() {
+                this.loading = true;
                 apiDataFilter.request({
                     apiPath: 'order.getTodayOrderList',
                     method: 'post',
                     data: '',
                     successCallback: (res) => {
-                        // this.tableData = res.data;
+                        this.loading = false;
+                        this.tableData = res.data.orderInfoList;
+                        this.number = res.data.carTotalCount;
+                        if(res.data.costTotal === null){
+                            this.total = '0.0'
+                        }else {
+                            this.total = res.data.costTotal
+                        }
+
                     },
                     errorCallback: (err) => {
-                        // 失败
-                        /*this.$notify.error({
-                            title: '失败',
-                            message: err.data.msg
-                        });*/
+                        this.loading = false;
                     },
                 })
             }

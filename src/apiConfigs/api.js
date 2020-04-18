@@ -27,7 +27,7 @@ export default {
             insertGarage: '/garage/insertGarage', // 新增车库信息
             deleteGarage: '/garage/deleteGarage', // 删除车库
             updateGarage: '/garage/updateGarage', // 更新车库信息,
-            getGarage: '/garage/getGarage', //修改车库信息
+            getGarage: '/garage/getGarage', //获取具体车库信息
             getTotalCarInfo: '/garage/getTotalCarInfo', // 停车场车库车位信息
             getGarageNameList: '/garage/getGarageNameList' // 获取车库名列表
 
@@ -51,6 +51,7 @@ export default {
             getCarOrder: '/order/getCarOrder', // 获取当前车位车辆信息
             addCarOrder: '/order/addCarOrder', // 车辆入库新增订单
             updateCarOrder: '/order/updateCarOrder', // 车辆车库修改订单
+            searchCarOrder: '/order/searchCarOrder' // 搜索车辆
         }
     }
 }

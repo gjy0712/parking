@@ -13,19 +13,19 @@
             <el-row>
                 <el-col :span="6">
                     <div class="grid-content">
-                        <el-select v-model="searchObj.carLocation" class="search-input" clearable @change="handleSearch()" size="small">
+                        <el-select v-model="searchObj.selectName" class="search-input" @change="handleSearch()" clearable size="small">
                             <el-option
                                     v-for="item in options"
-                                    :key="item.id"
-                                    :label="item.value"
-                                    :value="item.value">
+                                    :key="item.garageId"
+                                    :label="item.garageName"
+                                    :value="item.garageId">
                             </el-option>
                         </el-select>
                     </div>
                 </el-col>
                 <el-col :span="6">
                     <div class="grid-content">
-                        <el-button type="primary" size="small" @click="handleSearch" class="custom-button_long" icon="el-icon-search">搜索</el-button>
+                        <el-button type="primary" size="small" @click="handleSearch()" class="custom-button_long" icon="el-icon-search">搜索</el-button>
                     </div>
                 </el-col>
             </el-row>
@@ -34,16 +34,16 @@
         <!--车库列表展示-->
         <div class="car-content">
             <div>
-                名称：{{name}}
+                名称：{{garageName}}
                 <div class="space"></div>
-                车位总数：{{carTotal}}
+                车位总数：{{garageTotal}}
             </div>
-            <p>位置：{{location}}</p>
-            <p>描述：{{description}}</p>
+            <p>位置：{{garageLocation}}</p>
+            <p>描述：{{garageDescription}}</p>
         </div>
 
         <div class="content-box">
-            <div class="title">{{name}}车库</div>
+            <div class="title">{{garageName}}车库</div>
             <div class="style-box">
                 <img src="../../assets/images/minCar.png" alt="小车位">
                 <span>：小车位</span>
@@ -52,18 +52,22 @@
                 <span>：大车位</span>
                 <div class="car-space"></div>
                 <img src="../../assets/images/green.png" alt="">
-                <span>：有车</span>
+                <span>：无车</span>
                 <div class="car-space"></div>
                 <img src="../../assets/images/orange.png" alt="">
-                <span>：无车</span>
+                <span>：有车</span>
             </div>
-            <div style="padding: 10px" class="parking-list" v-for="(item) in carList" :key="item.name" @click="openDialog">
-                <img src="../../assets/images/minCar.png" alt="" class="parking-image">
-                <p style="color: #fff;width: 100%;margin: 0 auto">{{item.name}}</p>
-                <p style="font-size: 13px;color: #fff">{{item.parkingTime}}</p>
+            <div class="parking-list" v-for="(item, index) in carList" :key="item.id" @click="openDialog(index, item)">
+                <div :class="item.carStatus === 1 ? 'parking-success' : 'parking-danger' ">
+                    <img :src="item.carType === '小车位' ? minImage : maxImage " alt="" class="parking-image">
+                    <p style="color: #fff;width: 100%;margin: 0 auto">{{item.carName}}</p>
+                    <p style="font-size: 13px;color: #fff">{{item.carPrice}}元/{{item.carPriceTime}}小时</p>
+                </div>
+
             </div>
         </div>
 
+        <!--可以停车的dialog-->
         <el-dialog
                 title="停车"
                 :visible.sync="dialogVisiable"
@@ -74,14 +78,14 @@
             <div class="pop-box">
                 <div class="pop-title">
                     <div>
-                        车位名称：E1--1
+                        车位名称：{{carObj.carName}}
                         <div class="space"></div>
-                        车位位置：
+                        车位位置：{{carObj.carLocation}}
                     </div>
                     <div>
-                        车位类型：小车位
+                        车位类型：{{carObj.carType}}
                         <div class="space"></div>
-                        车位价格：10元/2小时
+                        车位价格：{{carObj.carPrice}}元/{{carObj.carPriceTime}}小时
                     </div>
                 </div>
                 <el-form
@@ -130,12 +134,52 @@
             </el-button>
         </span>
         </el-dialog>
+
+        <!--查看已经停了车的车辆信息-->
+        <el-dialog
+                title="车辆信息"
+                :visible.sync="dialogCarInfo"
+                class="el-dialog-style-reset"
+                :close-on-click-modal="false"
+                width="600px"
+                @click="handleCancelInfo()">
+            <div class="car-box">
+                <div class="car-message">
+                    <div class="car-number">
+                        车牌：
+                        <span class="color">{{carInfo.province}}{{carInfo.carnumber}}
+                        </span>
+                    </div>
+                    <div class="car-number">
+                        停车人姓名：
+                        <span class="color">{{carInfo.customername}}
+                        </span>
+                        <div style="display: inline-block;width: 40px"></div>
+                        停车人电话：
+                        <span class="color">{{carInfo.customerphone}}</span>
+                    </div>
+                    <div class="car-number">
+                        停车时间：
+                        <span class="color">{{carInfo.starttime}}
+                        </span>
+                    </div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <el-button size="small"
+                           class="custom-button_long"
+                           @click="handleCancelInfo()">关闭
+                    </el-button>
+                </div>
+            </div>
+        </el-dialog>
     </div>
 </template>
 
 <script>
     import { PageHeader } from "../../components/public";
     import apiDataFilter from "../../utils/apiDataFilter";
+    import {getLocalStore} from "../../utils/webstore-utils";
+    import { USER } from '@/config/webstore'
 
     export default {
         name: "vehicle-storage",
@@ -144,31 +188,18 @@
             return {
                 loading: false,
                 searchObj: {
-                    carLocation: ''
+                    selectName: ''
                 },
-                name: 'E1',
-                carTotal: '31',
-                location: '9号楼一层',
-                description: '',
-                options: {},
-                carList: [
-                    {
-                        name: 'E1--1',
-                        parkingTime: '10.0元/2.0小时'
-                    },
-                    {
-                        name: 'E1--2',
-                        parkingTime: '10.0元/2.0小时'
-                    },
-                    {
-                        name: 'E1--3',
-                        parkingTime: '10.0元/2.0小时'
-                    }
-                ],
+                garageName: '',
+                garageTotal: '',
+                garageLocation: '',
+                garageDescription: '',
+                options: [],  // 车库名字
+                carList: [],
                 dialogVisiable: false,
                 searchData: {
                     carNumber: '',
-                    carName: '',
+                    province: '京',
                     parkName: '',
                     parkPhone: ''
                 },
@@ -298,6 +329,27 @@
                         label: '新'
                     }
                 ],
+                garageId: '',
+                carObj: {
+                    carName: '',
+                    carLocation: '',
+                    carType: '',
+                    carPrice: '',
+                    carPriceTime: '',
+                    id: '',
+                    garageId: ''
+                },
+                userId: '',
+                dialogCarInfo: false,
+                carInfo: {
+                    province: '',
+                    carnumber: '',
+                    customername: '',
+                    customerphone: '',
+                    createTime: ''
+                },
+                maxImage: require("../../assets/images/maxCar.png"),
+                minImage: require('../../assets/images/minCar.png')
 
             }
         },
@@ -305,7 +357,6 @@
             searchRule() {
                 const validateProvince = (rule, value, callback) => {
                     let carNumber = this.$refs.carNumber.value;
-                    console.log(value + carNumber)
                     if( value === '') {
                         callback(new Error('车牌省市不能为空'));
                     }else if( carNumber === '') {
@@ -331,37 +382,175 @@
                 }
             }
         },
+        mounted() {
+            let userObj = JSON.parse(getLocalStore(USER))
+            this.userId = userObj.id;
+        },
         created() {
             this.getGarageNameList()
+            this.getGarage()
         },
         methods: {
+            // 搜索
             handleSearch() {
+                this.getGarage()
+                this.getCarList()
+            },
 
+            // 打开dialog
+            openDialog(index, item) {
+                if( item.carStatus === 1){
+                    this.dialogVisiable = true
+                }else {
+                    this.getCarOrder(item.id)
+                    this.dialogCarInfo = true
+                }
+                this.carObj = this.carList[index]
             },
-            openDialog() {
-                this.dialogVisiable = true
-            },
+            // 关闭停车的dialog
             handleCancel(forName) {
+                this.searchData = {
+                    carNumber: '',
+                    province: '京',
+                    parkName: '',
+                    parkPhone: ''
+                }
                 this.$refs[forName].clearValidate()
                 this.dialogVisiable = false
-            },
-            handleSubmit() {
 
             },
+            // 停车
+            handleSubmit() {
+                this.$refs['info'].validate(valid => {
+                    if (valid) {
+                        this.loading = true;
+                        apiDataFilter.request({
+                            apiPath: 'order.addCarOrder',
+                            method:'post',
+                            data: {
+                                province: this.searchData.province,
+                                carnumber: this.searchData.carNumber,
+                                customername: this.searchData.parkName,
+                                customerphone: this.searchData.parkPhone,
+                                garageId: this.carObj.garageId,
+                                carId: this.carObj.id,
+                                userId: this.userId
+                            },
+                            successCallback: (res) => {
+                                this.loading = false;
+                                this.$notify({
+                                    title: '成功',
+                                    message: '停车成功',
+                                    type: "success"
+                                });
+                                this.dialogVisiable = false;
+                                this.searchData = {
+                                    carNumber: '',
+                                    province: '京',
+                                    parkName: '',
+                                    parkPhone: ''
+                                }
+                                this.getCarList();
+                            },
+                            errorCallback: (err) => {
+                                this.$notify.error({
+                                    title: '失败',
+                                    message: '停车失败'
+                                });
+                                this.loading = false;
+                                this.dialogVisiable = false;
+                                this.searchData = {
+                                    carNumber: '',
+                                    province: '京',
+                                    parkName: '',
+                                    parkPhone: ''
+                                }
+                                this.getCarList();
+                            },
+                            completeCallback: () => {
+                                this.loading = false
+                            }
+                        })
+                    }
+                })
+            },
+
+            handleCancelInfo() {
+                this.dialogCarInfo = false
+
+            },
+            // 获取车库名称
             getGarageNameList() {
                 apiDataFilter.request({
                     apiPath: 'garage.getGarageNameList',
                     method: 'POST',
                     data: '',
                     successCallback: (res) => {
-                        this.options = res.data;
-                        console.log(this.options)
+                        this.options = res.data.garageNameAndIdInfos;
+                        // this.searchObj.garageName = res.data.garageNameAndIdInfos[0].garageName;
+                    },
+                    errorCallback: (res) => {
+
+                    }
+                })
+            },
+
+            // 获取车库信息
+            getGarage() {
+                apiDataFilter.request({
+                    apiPath: 'garage.getGarage',
+                    method: 'POST',
+                    data: {
+                        garageId: this.searchObj.selectName,
+                    },
+                    successCallback: (res) => {
+                        this.garageName = res.data.garageName;
+                        this.garageLocation = res.data.garageLocation;
+                        this.garageDescription = res.data.garageDescription;
+                        this.garageTotal = res.data.garageTotal;
+                    },
+                    errorCallback: (res) => {
+
+                    }
+                })
+            },
+
+            // 获取停车信息
+            getCarList() {
+                apiDataFilter.request({
+                    apiPath: 'car.getCarList',
+                    method:'POST',
+                    data: {
+                        garageId: this.searchObj.selectName,
+                        pageNum: 1,
+                        pageSize: 100
+                    },
+                    successCallback: (res) => {
+                        this.carList = res.data.list;
+                    },
+                    errorCallback: (res) => {
+
+                    }
+                })
+            },
+
+            // 获取当前车位车辆信息
+            getCarOrder(id) {
+                apiDataFilter.request({
+                    apiPath: 'order.getCarOrder',
+                    method: 'POST',
+                    data: {
+                        carId: id
+                    },
+                    successCallback: (res) => {
+                        this.carInfo = res.data
                     },
                     errorCallback: (res) => {
 
                     }
                 })
             }
+
         }
     }
 </script>
@@ -405,6 +594,7 @@
             }
             .style-box {
                 border-bottom: solid 1px #7d9da0;
+                padding-bottom: 5px;
                 .car-space {
                     display: inline-block;
                     width: 30px;
@@ -412,31 +602,55 @@
             }
 
             .parking-list {
-                background-color: #00B51D;
-                border-radius: 5px;
                 width: 100px;
                 height: 100px;
+                line-height: 33px;
+                text-align: center;
                 float: left;
-                margin: 10px 20px;
+                margin: 15px 12px;
+                .parking-success {
+                    background-color: #00B51D;
+                    border-radius: 10px;
+                    padding-top: 5px;
+                }
 
-                .parking-image {
-
-
+                .parking-danger {
+                    background-color: #ff5000;
+                    border-radius: 10px;
+                    padding-top: 5px;
                 }
             }
+
         }
 
         .pop-box {
             padding: 0 40px;
 
             .pop-title {
-                color: #aa1520;
+                color: #ff5000;
                 margin-bottom: 20px;
 
                 .space {
                     display: inline-block;
                     width: 50px;
                 }
+            }
+        }
+
+        .car-box {
+            padding: 20px;
+            .car-message {
+                background-color: #dff0d8;
+                padding: 20px;
+                margin-bottom: 20px;
+                .car-number {
+                    .color {
+                        color: #ff5000;
+                    }
+                }
+            }
+            .dialog-footer {
+                text-align: center;
             }
         }
     }

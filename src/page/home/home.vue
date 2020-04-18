@@ -9,7 +9,7 @@
 
         <div class="content-box">
             <!--            个人信息和车库信息部分内容展示-->
-            <div class="message-box">
+            <div class="car-box">
                 <div class="box-title">{{name}},欢迎您使用停车场收费系统!</div>
                 <div class="box-description">{{description}}</div>
                 <div class="box-button">
@@ -52,6 +52,21 @@
                     </div>
                 </el-col>
             </el-row>
+
+
+        </div>
+
+        <div class="message-content">
+            <div class="message-title">公告列表</div>
+            <div class="message-box" v-for="item in messageInfoList" :key="item.id" :loading="loading">
+                <span class="title">{{item.title}}</span>
+                <div class="content">{{item.content}}</div>
+                <div class="name">{{item.name}}</div>
+                <span class="create-time">{{item.creattime}}</span>
+                <!--<el-button class="delete" type="text" size="mini" @click="handleDetail(item.id)">详情</el-button>-->
+
+            </div>
+
         </div>
 
         <search-dialog ref="search_ref"></search-dialog>
@@ -73,6 +88,7 @@
         components: {CalculateFeeDialog, SearchDialog, PageHeader },
         data() {
             return {
+                loading: false,
                 totalCarInfo: {
                     usingCarNum: '',   // 使用车位
                     unUsedCarNum: '',   //空闲车位
@@ -81,6 +97,8 @@
                 },
                 name: '',
                 description: '',
+                messageInfoList: []
+
 
             }
         },
@@ -122,16 +140,20 @@
                     },
                 })
             },
+            // 获取公告列表
             getMessageList() {
+                this.loading = true;
                 apiDataFilter.request({
                     apiPath: 'message.getMessageList',
                     method: 'POST',
                     data: '',
                     successCallback: (res)=> {
+                        this.loading = false;
+                        this.messageInfoList = res.data.messageInfoList
 
                     },
                     errorCallback: (res) => {
-
+                        this.loading = false
                     }
                 })
             }
@@ -144,7 +166,7 @@
     .home-container {
         .content-box {
             margin-top: 15px;
-            .message-box {
+            .car-box {
                 color: #3877aa;
                 background-color: #d3d3d3;
                 border-radius: 10px;
@@ -210,7 +232,51 @@
                     color: #fff;
                 }
             }
+        }
+
+        .message-content {
+            padding: 60px 0 0 30px;
+            .message-title {
+                border-left: 2px solid #20a0ff;
+                margin-bottom: 20px;
+                color: #000;
+                padding-left: 5px;
+            }
+            .message-box {
+                padding: 0 0 0 10px;
+                position: relative;
+                height: 60px;
+                line-height: 60px;
+                background-color: #CAE1FB;
+                border-radius: 20px;
+                margin-bottom: 10px;
+                .title {
+                    font-size: 14px;
+                    padding-right: 10px;
+                }
+                .content {
+                    color: #8CB5A9;
+                    padding-right: 10px;
+                    width: 500px;
+                    display: inline-block;
+                }
+                .name {
+                    color: #8CB5A9;
+                    padding-right: 5px;
+                    width: 60px;
+                    display: inline-block;
+                    position: absolute;
+                    left: 550px;
+                }
+                .create-time {
+                    color: #8CB5A9;
+                    display: inline-block;
+                    position: absolute;
+                    left: 610px;
+                }
+            }
 
         }
+
     }
 </style>

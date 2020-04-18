@@ -101,7 +101,7 @@
                         :validate-on-rule-change="false"
                         class="demo-ruleForm">
                     <el-form-item label="名称：" prop="carName">
-                        <el-input v-model.trim="infoData.carName" placeholder="请输入车库的名称"></el-input>
+                        <el-input v-model.trim="infoData.carName" placeholder="请输入车位的名称"></el-input>
                     </el-form-item>
                     <el-form-item label="位置：" prop="carLocation">
                         <el-input v-model.trim="infoData.carLocation" placeholder="请输入车位位置（可以不填）"></el-input>
