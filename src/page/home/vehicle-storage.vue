@@ -392,7 +392,7 @@
         },
         created() {
             this.getGarageNameList()
-            this.getGarage()
+            // this.getGarage()
         },
         methods: {
             // 搜索

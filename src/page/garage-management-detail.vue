@@ -57,7 +57,7 @@
                             <template slot-scope="scope">
                                 <el-button type="text"
                                            icon="el-icon-edit"
-                                           @click="handleEdit(scope.$index)">
+                                           @click="handleEdit(scope.$index, scope.row.id)">
                                 </el-button>
                                 <el-button type="text"
                                            icon="el-icon-delete"
@@ -247,7 +247,8 @@
                     carType: '小车位',
                     carPrice: '',
                     carPriceTime: '',
-                    carLocation: ''
+                    carLocation: '',
+                    carId: ''
                 },
                 typeList: [
                     {
@@ -473,16 +474,16 @@
             },
 
             // 修改车位
-            handleEdit(index) {
+            handleEdit(index, carId) {
                 this.isEdited = true
                 this.dialogVisibleGarage = true;
-                // console.log(this.tableData[index])
                 this.infoData = {
                     carName: this.tableData[index].carName,
                     carType: this.tableData[index].carType,
                     carPrice: this.tableData[index].carPrice,
                     carPriceTime: this.tableData[index].carPriceTime,
-                    carLocation: this.tableData[index].carLocation
+                    carLocation: this.tableData[index].carLocation,
+                    carId: this.tableData[index].id
                 }
             },
 
@@ -550,6 +551,7 @@
                             apiPath: api,
                             method:'post',
                             data: {
+                                id: this.infoData.carId,
                                 carName: this.infoData.carName,
                                 carType: this.infoData.carType,
                                 carPrice: this.infoData.carPrice,

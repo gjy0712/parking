@@ -166,7 +166,7 @@
                                     status: JSON.parse(getLocalStore(USER)).status,
                                     type: JSON.parse(getLocalStore(USER)).type
                                 }
-                                console.log(deleteUserInfo)
+                                // console.log(deleteUserInfo)
                                 setLocalStore(USER, deleteUserInfo)
                                 this.dialogEditInfo = false
                             },

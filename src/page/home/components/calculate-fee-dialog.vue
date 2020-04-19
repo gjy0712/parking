@@ -39,29 +39,33 @@
                 </div>
                 <div class="count-content">
                     车库：<span class="count-color">{{feeList.garageName}}</span>
-                    <div class="count-space"></div>
-                    车位：<span class="count-color">{{feeList.carName}}</span>
+                    <div class="car-position">
+                        车位：<span class="count-color">{{feeList.carName}}</span>
+                    </div>
                 </div>
                 <!--<div class="count-content">
                     车位类型：<span class="count-color">{{feeList.province}}</span>
                 </div>-->
                 <div class="count-content">
                     入库时间：<span class="count-color">{{feeList.starttime}}</span>
-                    <div style="display: inline-block;width: 20px"></div>
-                    出库时间：<span class="count-color">{{feeList.endtime}}</span>
+                    <div class="car-position">
+                        出库时间：<span class="count-color">{{feeList.endtime}}</span>
+                    </div>
                 </div>
                 <div class="count-content">
                     价格：<span class="count-color">{{feeList.carPrice}}元/{{feeList.carPriceTime}}小时</span>
-                    <div class="count-space"></div>
-                    停车时间：<span class="count-color">{{feeList.time}}小时</span>
+                    <div class="car-position">
+                        停车时间：<span class="count-color">{{feeList.time}}小时</span>
+                    </div>
                 </div>
                 <div class="count-content">
                     操作人：<span class="count-color">{{feeList.userName}}</span>
-                    <div class="count-space"></div>
-                    工号：<span class="count-color">{{feeList.userCode}}</span>
+                    <div class="car-position">
+                        工号：<span class="count-color">{{feeList.userCode}}</span>
+                    </div>
                 </div>
                 <div class="count-content count-total">
-                    总计：<span class="total-color">{{feeList.cost}}</span>
+                    总计：<span class="total-color">{{feeList.cost}}元</span>
                 </div>
             </div>
         </div>
@@ -316,15 +320,21 @@
                 border-radius: 10px;
 
                 .count-content {
+                    position: relative;
 
                     .count-color {
                         color: #ff4400;
                         font-size: 12px;
                     }
+                    .car-position {
+                        display: inline-block;
+                        position: absolute;
+                        left: 225px;
+                    }
 
                     .count-space {
                         display: inline-block;
-                        width: 65px;
+                        width: 117px;
                     }
                 }
 
