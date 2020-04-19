@@ -197,12 +197,14 @@
                 options: [],  // 车库名字
                 carList: [],
                 dialogVisiable: false,
+                // 停车传入的字段
                 searchData: {
                     carNumber: '',
                     province: '京',
                     parkName: '',
                     parkPhone: ''
                 },
+                // 车牌号
                 optionList: [
                     {
                         value: '京',
@@ -330,6 +332,7 @@
                     }
                 ],
                 garageId: '',
+                // 停车获取的信息
                 carObj: {
                     carName: '',
                     carLocation: '',
@@ -341,6 +344,7 @@
                 },
                 userId: '',
                 dialogCarInfo: false,
+                // 获取车辆信息
                 carInfo: {
                     province: '',
                     carnumber: '',
@@ -530,7 +534,9 @@
                     successCallback: (res) => {
                         if(res.data) {
                             this.carList = res.data.list;
-
+                        }else {
+                            this.$message.warning('此车库中没有车位信息！')
+                            this.carList = ''
                         }
                     },
                     errorCallback: (res) => {

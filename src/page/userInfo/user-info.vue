@@ -84,6 +84,7 @@
         },
         mounted() {
             let userObj = JSON.parse(getLocalStore(USER))
+            console.log(userObj)
             if (userObj) {
                 this.userInfo.code = userObj.code
                 this.userInfo.username = userObj.username

@@ -219,9 +219,9 @@
                     if (value === '') {
                         callback(new Error('工号不能为空'));
                     } else {
-                        const reg = /[0-9]{5}/;
+                        const reg = /^[0-9]{5}$/;
                         if (!reg.test(value)) {
-                            callback(new Error('工号为5为数字'));
+                            callback(new Error('工号只能为5为数字'));
                         } else {
                             callback();
                         }
@@ -459,8 +459,8 @@
                             apiPath: 'user.insertUser',
                             method: 'post',
                             data: {
-                                code: this.employeeData.code,
                                 username: this.employeeData.username,
+                                code: this.employeeData.code,
                                 name: this.employeeData.name,
                                 sex: this.employeeData.sex,
                                 email: this.employeeData.email,

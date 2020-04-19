@@ -61,7 +61,8 @@
     import bus from '../bus';
     import UpdatePasswordDialog from "./update-password-dialog";
     import apiDataFilter from "../../../utils/apiDataFilter";
-
+    import {getLocalStore, removeLocalStore } from "../../../utils/webstore-utils";
+    import { TOKEN } from '@/config/webstore'
 
     export default {
         name: "park-header",
@@ -71,6 +72,8 @@
                 collapse: false,
                 dialogVisiable: false
             }
+        },
+        mounted() {
         },
         methods: {
             changeAsideStatus() {
@@ -100,7 +103,7 @@
                             }
                         })*/
                         //退出登录，清空token
-                        localStorage.removeItem('Authorization');
+                        removeLocalStore(TOKEN);
                         this.$router.push('/login');
                         /*localStorage.removeItem('ms_username');
                         this.$router.push('/login');*/

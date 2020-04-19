@@ -47,9 +47,8 @@
 
 <script>
     import apiDataFilter from "../../../utils/apiDataFilter";
-    import {getLocalStore} from "../../../utils/webstore-utils";
+    import {getLocalStore, setLocalStore} from "../../../utils/webstore-utils";
     import { USER } from '@/config/webstore'
-
 
     export default {
         name: "edit-info-dialog",
@@ -60,7 +59,7 @@
             return {
                 dialogEditInfo: false,
                 loading: false,
-                id: ''
+                id: '',
             }
         },
         computed: {
@@ -153,6 +152,22 @@
                                     message: '编辑成功',
                                     type: "success"
                                 });
+                                // 再次存储已经更新的信息
+                                let deleteUserInfo = {
+                                    code: JSON.parse(getLocalStore(USER)).code,
+                                    username: JSON.parse(getLocalStore(USER)).username,
+                                    name: this.userInfo.name,
+                                    email: this.userInfo.email,
+                                    phone: this.userInfo.phone,
+                                    description: this.userInfo.description,
+                                    id: JSON.parse(getLocalStore(USER)).id,
+                                    sex: JSON.parse(getLocalStore(USER)).sex,
+                                    heading: JSON.parse(getLocalStore(USER)).heading,
+                                    status: JSON.parse(getLocalStore(USER)).status,
+                                    type: JSON.parse(getLocalStore(USER)).type
+                                }
+                                console.log(deleteUserInfo)
+                                setLocalStore(USER, deleteUserInfo)
                                 this.dialogEditInfo = false
                             },
                             errorCallback: (err) => {
@@ -160,8 +175,9 @@
                                 // 失败
                                 this.$notify.error({
                                     title: '失败',
-                                    message: '修改失败'
+                                    message: '编辑失败'
                                 });
+                                this.dialogEditInfo = false
                             },
                         })
                     }

@@ -46,8 +46,8 @@
 
 <script>
     import apiDataFilter from "../../../utils/apiDataFilter";
-    import {getLocalStore} from "../../../utils/webstore-utils";
-    import { USER } from '@/config/webstore'
+    import {getLocalStore, removeLocalStore } from "../../../utils/webstore-utils";
+    import { USER, TOKEN } from '@/config/webstore'
     import store from '@/vuex/store'
 
    export default {
@@ -122,9 +122,12 @@
                             successCallback: (res) => {
                                 this.optionsLoading = false
                                 this.$message.success('密码修改成功，请重新登录！')
-                                store.dispatch('LogOut').then(() => {
+                                // 清空token
+                                removeLocalStore(TOKEN)
+                                this.$router.push('/login');
+                                /*store.dispatch('LogOut').then(() => {
                                     location.reload() // 为了重新实例化vue-router对象 避免bug
-                                })
+                                })*/
                                 /*if (this.isLogin){
                                     this.$message.success('密码修改成功，请重新登录！')
                                     store.dispatch('LogOut').then(() => {
