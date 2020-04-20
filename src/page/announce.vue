@@ -169,7 +169,7 @@
 
                         },
                         errorCallback: (res) => {
-                            this.$message.success('删除失败')
+                            this.$message.error('删除失败')
                             this.getList()
 
 
