@@ -69,7 +69,7 @@
                     },
                     {
                         icon: 'el-icon-user',
-                        index: 'employee',
+                        index: 'peopleManage',
                         title: '人员管理'
                     },
                     {
