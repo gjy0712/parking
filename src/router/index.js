@@ -16,9 +16,14 @@ export const defaultRouterMap = [
         meta: { title:'登录' }
     },
     {
+        path: '/employee',
+        redirect: '/employee/home'
+    },
+    // 管理员模块
+    {
         path: '/home',
         component: () => import('../components/component/home'),
-        meta: { title: '主模块'},
+        meta: { title: '管理员模块'},
         children: [
             {
                 path: '/home',
@@ -61,7 +66,35 @@ export const defaultRouterMap = [
                 meta: { title: '今日工作'}
             }
         ]
-    }
+    },
+    // 普通职员模块
+    {
+        path: '/employee/home',
+        component: () => import('../components/component/employee-aside/employee-home'),
+        meta: { title: '普通职员模块'},
+        children: [
+            {
+                path: '/employee/home',
+                component: () => import('../page/employee/home/home'),
+                meta: { title: '首页' }
+            },
+            {
+                path: '/employee/userInfo',
+                component: () => import('../page/employee/userInfo/user-info'),
+                meta: { title: '普通职员个人信息' }
+            },
+            {
+                path: '/employee/carInfo',
+                component: () => import('../page/employee/home/vehicle-storage'),
+                meta: { title: '普通职员车辆入库' }
+            },
+            {
+                path: '/employee/todayWork',
+                component: () => import('../page/employee/work-today'),
+                meta: { title: '普通职员今日工作'}
+            }
+        ]
+    },
 
 ]
 

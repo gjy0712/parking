@@ -87,7 +87,11 @@
                                     message: '登录成功！',
                                     type: "success"
                                 });
-                                this.$router.push('/home');
+                                if(res.data.user.type === 'ADMIN'){
+                                    this.$router.push('/home');
+                                }else {
+                                    this.$router.push('/employee');
+                                }
                             },
                             errorCallback: (err) => {
                                 // 失败

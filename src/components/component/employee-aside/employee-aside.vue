@@ -50,41 +50,27 @@
 </template>
 
 <script>
-    import bus from '../bus';
+    import bus from "../bus";
+
     export default {
-        name: "park-aside",
+        name: "employee-aside",
         data() {
             return {
                 collapse: false,
                 items: [
                     {
                         icon: 'el-icon-s-home',
-                        index: 'home',
+                        index: '/employee/home',
                         title: '首页'
                     },
                     {
                         icon: 'el-icon-chat-line-round',
-                        index: 'userInfo',
+                        index: '/employee/userInfo',
                         title: '个人信息'
                     },
                     {
-                        icon: 'el-icon-user',
-                        index: 'employee',
-                        title: '人员管理'
-                    },
-                    {
-                        icon: 'el-icon-truck',
-                        index: 'carStationList',
-                        title: '车库管理'
-                    },
-                    {
-                        icon: 'el-icon-chat-dot-square',
-                        index: 'message',
-                        title: '发布公告',
-                    },
-                    {
                         icon: 'el-icon-suitcase-1',
-                        index: 'todayWork',
+                        index: '/employee/todayWork',
                         title: '今日工作'
                     }
                 ]
@@ -105,7 +91,7 @@
     }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
     .aside-component {
         display: block;
         position: absolute;
