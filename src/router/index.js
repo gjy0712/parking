@@ -41,7 +41,7 @@ export const defaultRouterMap = [
                 meta: { title: '车辆入库' }
             },
             {
-                path: '/employee',
+                path: '/peopleManage',
                 component: () => import('../page/people-management'),
                 meta: { title: '人员管理' }
             },
